@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"github.com/Redgwell/bldr/pkg/contexts"
+	"github.com/Redgwell/bldr/pkg/lib/git"
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 )
@@ -21,11 +22,13 @@ func (p *GitContextLoader) Execute(contextProvider *contexts.ContextProvider) er
 	bc := contextProvider.BuildContext
 	p.logger.Infof("Loading git context for path %s", bc.PathContext.RepoRootDirectory)
 
-	// TODO - load:
-	// bc.GitContext.BranchName
-	// bc.GitContext.FullCommitSha
-	// bc.GitContext.ShortCommitSha = bc.GitContext.FullCommitSha[:7]
-	// bc.GitContext.MainBranchForkPoint
+	git := git.New(p.logger, bc.GitContext.MainBranchName, bc.PathContext.RepoRootDirectory)
+	git.LoadRepoInformation()
+
+	bc.GitContext.BranchName = git.BranchName
+	bc.GitContext.FullCommitSha = git.CommitSha
+	bc.GitContext.ShortCommitSha = bc.GitContext.FullCommitSha[:7]
+	bc.GitContext.MainBranchForkPoint = git.MainBranchForkPoint
 
 	return nil
 }
