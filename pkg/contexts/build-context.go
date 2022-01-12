@@ -8,7 +8,7 @@ type BuildContext struct {
 	PathContext      *PathContext
 }
 
-func CreateBuildContext( /*TODO - set paths */ ) *BuildContext {
+func CreateBuildContext() *BuildContext {
 	return &BuildContext{
 		ArtefactManifest: &ArtefactManifest{
 			Artefacts: make(map[string]string),
@@ -19,7 +19,9 @@ func CreateBuildContext( /*TODO - set paths */ ) *BuildContext {
 			PushContainers:                  false,
 			UseRemoteContainerRegistryCache: false,
 		},
-		GitContext:  &GitContext{},
+		GitContext: &GitContext{
+			MainBranchName: "main", // TODO - make configurable
+		},
 		PathContext: &PathContext{},
 	}
 }
@@ -41,6 +43,7 @@ type GitContext struct {
 	ShortCommitSha      string
 	BranchName          string
 	MainBranchForkPoint string
+	MainBranchName      string
 }
 
 type PathContext struct {
