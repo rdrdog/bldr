@@ -1,0 +1,10 @@
+**/.vs
+**/.vscode
+**/.DS_Store
+**/.idea
+
+secrets
+**/node_modules
+
+
+samples/examples

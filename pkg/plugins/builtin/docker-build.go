@@ -81,5 +81,6 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
 	} else {
 		p.logger.Infof("🦘 Skipping build of target: %s", p.Name)
 	}
+
 	return nil
 }

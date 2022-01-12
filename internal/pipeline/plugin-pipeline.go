@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Redgwell/bldr/internal/config"
 	"github.com/Redgwell/bldr/internal/models"
@@ -71,7 +72,11 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 func (p *PluginPipeline) Run() error {
 
 	for _, plugin := range p.plugins {
+		start := time.Now()
+
 		err := plugin.Execute(p.contextProvider)
+
+		p.logger.Infof("⏳ plugin took %v seconds", time.Since(start).Seconds())
 
 		if err != nil {
 
