@@ -39,11 +39,12 @@ type DockerContext struct {
 }
 
 type GitContext struct {
-	FullCommitSha       string
-	ShortCommitSha      string
-	BranchName          string
-	MainBranchForkPoint string
-	MainBranchName      string
+	FullCommitSha          string
+	ShortCommitSha         string
+	BranchName             string
+	MainBranchForkPoint    string
+	MainBranchName         string
+	ChangesSinceMainBranch []string
 }
 
 type PathContext struct {
@@ -52,4 +53,8 @@ type PathContext struct {
 
 func (am *ArtefactManifest) AddArtefact(targetName string, artefactPath string) {
 	am.Artefacts[targetName] = artefactPath
+}
+
+func (g *GitContext) CanDetectChanges() bool {
+	return len(g.ChangesSinceMainBranch) > 0
 }

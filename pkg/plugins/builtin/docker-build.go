@@ -41,7 +41,7 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
 
 	shouldBuildContainer := true
 	/*
-		if (gitState.CanDetectChanges()) {
+		if bc.GitContext.CanDetectChanges() {
 			if (cm.IsAffectedByDiff(gitState.ChangesSinceMainBranch))
 			{
 					Log.Information($"Container {cm.Name} found to be affected by changes");

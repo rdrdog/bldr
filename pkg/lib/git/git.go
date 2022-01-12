@@ -127,7 +127,3 @@ func (g *Git) LoadRepoInformation() *Git {
 
 	return g
 }
-
-func (g *Git) CanDetectChanges() bool {
-	return len(g.ChangesSinceMainBranch) > 0
-}
