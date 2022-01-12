@@ -1,51 +1,35 @@
 projectName: my-example
 
 targets:
-  - name: team-infra-services
-    build:
-      plugin: builtin/DockerBuild
-      path: src/team-infra-services/Dockerfile
-      include:
-        - src/team-infra-services/**
-    deploy:
-      plugin: builtin/DockerRun
-      permitInfraScanFailures: true
-      secrets:
-        - key: launchdarkly-access-token
-          envValue: LAUNCHDARKLY_ACCESS_TOKEN
-          loadFromFile: true
-        - key: GH_ADMIN_TOKEN
-          envValue: GITHUB_TOKEN
-          loadFromFile: true
-        - key: ADO_ACCESS_TOKEN
-          envValue: AZDO_PERSONAL_ACCESS_TOKEN
-          loadFromFile: true
-
   - name: infra-example
     build:
       plugin: builtin/DockerBuild
-      path: src/example/infra/Dockerfile
+      path: samples/examples/infra/Dockerfile
       include:
-        - src/example/infra/**
+        - samples/examples/infra/**
     deploy:
       plugin: builtin/DockerRun
+      secrets:
+        - key: GH_ADMIN_TOKEN
+          envValue: GITHUB_TOKEN
+          loadFromFile: true
 
-  - name: example-ui
+  - name: example-api
     build:
       plugin: builtin/DockerBuild
-      path: src/example/ui/Dockerfile
+      path: samples/examples/api/Dockerfile
       include:
-        - src/example/ui/**
+        - samples/examples/api/**
     deploy:
       plugin: builtin/K8sDeploy
-      runtimeConfiguration: src/example/ui/k8s.yaml
+      runtimeConfiguration: samples/examples/ui/k8s.yaml
 
   - name: test-example
     build:
       plugin: builtin/DockerBuild
-      path: src/example/tests/Dockerfile
+      path: samples/examples/tests/Dockerfile
       include:
-        - src/example/tests/**
+        - samples/examples/tests/**
     deploy:
       plugin: builtin/DockerRun
       runFromK8s: true
