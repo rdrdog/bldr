@@ -64,7 +64,7 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
 
 	if shouldBuildContainer {
 
-		p.logger.Infof("⚒️ Building container %s -> %s:%s", p.Name, imageName, imageTag)
+		p.logger.Infof("🧱 Building container %s -> %s:%s", p.Name, imageName, imageTag)
 
 		if bc.DockerContext.UseRemoteContainerRegistryCache {
 			docker.PullLatest(imageName)
@@ -75,6 +75,8 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
 		if bc.DockerContext.PushContainers {
 			docker.Push(imageName, imageTag)
 			docker.Push(imageName, "latest")
+		} else {
+			p.logger.Infof("⏭  skipping container push for %s", imageName)
 		}
 
 		contextProvider.BuildContext.ArtefactManifest.AddArtefact(p.Name, imageName)

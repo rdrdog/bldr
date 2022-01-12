@@ -10,6 +10,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
+	gopkg.in/yaml.v2 v2.2.2
 )
 
 require (
@@ -21,5 +22,4 @@ require (
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
 	golang.org/x/sys v0.0.0-20220111092808-5a964db01320 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

@@ -10,7 +10,7 @@ func main() {
 	logger := logrus.New()
 	config, err := config.Load(logger)
 	if err != nil {
-		logger.Fatal("could no initialise configuration")
+		logger.Fatalf("could no initialise configuration: %v", err)
 		return
 	}
 
@@ -21,14 +21,6 @@ func main() {
 	if err != nil {
 		logger.Fatalf("error loading plugins: %v", err)
 	}
+	//pp.AddDefaultPostBuildTargets()
 	pp.Run()
 }
-
-/*
-TODO:
-- main entrypoint to load config
-	- Use env override stuff from WP
-	- load config from .bldr
-	- use default plugin suite for the command ('build', or 'deploy')
-- Init the pluginPipeline from here then execute it
-*/

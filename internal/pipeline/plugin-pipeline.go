@@ -12,7 +12,7 @@ import (
 )
 
 type PluginPipeline struct {
-	config          *config.Base
+	config          *config.Configuration
 	contextProvider *contexts.ContextProvider
 	logger          *logrus.Logger
 	mode            string
@@ -24,7 +24,7 @@ func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
 	p.plugins = append(p.plugins, plugin)
 }
 
-func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Base, mode string) *PluginPipeline {
+func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, mode string) *PluginPipeline {
 	registry := plugins.NewRegistry(logger)
 	registry.RegisterBuiltIn()
 
@@ -71,6 +71,8 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 
 func (p *PluginPipeline) Run() error {
 
+	pipelineStart := time.Now()
+
 	for _, plugin := range p.plugins {
 		start := time.Now()
 
@@ -85,6 +87,8 @@ func (p *PluginPipeline) Run() error {
 			return err
 		}
 	}
+
+	p.logger.Infof("✅ pipeline took %v seconds", time.Since(pipelineStart).Seconds())
 
 	return nil
 }

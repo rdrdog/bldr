@@ -7,11 +7,6 @@ import (
 	"golang.org/x/term"
 )
 
-// LoggingConfig configures logging:
-type LoggingConfig struct {
-	Level string `env:"LOGGING_LEVEL" envDefault:"INFO"`
-}
-
 // SetFormatter sets the appropriate log formatter for our terminal (JSON if we're in Docker):
 func (l *LoggingConfig) SetFormatter(logger *logrus.Logger) {
 

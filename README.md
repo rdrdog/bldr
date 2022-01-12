@@ -1,6 +1,11 @@
 # bldr
 
 
+## Config
+- Support .bldrrc for setting repo defaults
+  - Alternatively, these could just go in the pipeline-config.yaml ?
+  - Main branch name
+  - Container registry
 
 ## Plugins
 
@@ -11,6 +16,10 @@
     - EnsureDeploymentBaseExists (?)
     - Manifest writer (after all pipeline plugins have run)
     - DeploymentContainer builder
+
+  - deploy
+    - DockerRun
+    - K8sDeploy
 
 
 - Could look to use the go plugin system: https://medium.com/learning-the-go-programming-language/writing-modular-go-programs-with-plugins-ec46381ee1a9
