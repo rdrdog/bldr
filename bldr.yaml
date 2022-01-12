@@ -6,11 +6,13 @@ default:
     path: samples/pipeline-config.yaml
   docker:
     useBuildKit: true
+  git:
+    mainBranchName: main
 
 local:
   docker:
     includeTimeInImageTag: true
-    useRemoteContainerRegistryCache: true
+    useRemoteContainerRegistryCache: false
     pushContainers: false
     registry: ""
 

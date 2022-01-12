@@ -3,7 +3,6 @@ package contexts
 type BuildContext struct {
 	BuildNumber      string
 	ArtefactManifest *ArtefactManifest
-	DockerContext    *DockerContext
 	GitContext       *GitContext
 	PathContext      *PathContext
 }
@@ -13,15 +12,7 @@ func CreateBuildContext() *BuildContext {
 		ArtefactManifest: &ArtefactManifest{
 			Artefacts: make(map[string]string),
 		},
-		DockerContext: &DockerContext{
-			UseBuildKit:                     true,
-			IncludeTimeInTags:               false,
-			PushContainers:                  false,
-			UseRemoteContainerRegistryCache: false,
-		},
-		GitContext: &GitContext{
-			MainBranchName: "main", // TODO - make configurable
-		},
+		GitContext:  &GitContext{},
 		PathContext: &PathContext{},
 	}
 }
@@ -30,20 +21,11 @@ type ArtefactManifest struct {
 	Artefacts map[string]string
 }
 
-type DockerContext struct {
-	UseBuildKit                     bool
-	Registry                        string
-	IncludeTimeInTags               bool
-	PushContainers                  bool
-	UseRemoteContainerRegistryCache bool
-}
-
 type GitContext struct {
 	FullCommitSha          string
 	ShortCommitSha         string
 	BranchName             string
 	MainBranchForkPoint    string
-	MainBranchName         string
 	ChangesSinceMainBranch []string
 }
 
