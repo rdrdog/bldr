@@ -20,16 +20,9 @@ func (p *DockerBuild) SetConfig(logger *logrus.Logger, targetName string, plugin
 }
 
 func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider /*projectName string, targetName string*/) error {
-	p.logger.Infof("Running docker build with config: Path: %s, Include: %d", p.Path, p.Include)
+	p.logger.Infof("Running docker build with config: Path: %s, Include: %v", p.Path, p.Include)
 
 	shouldBuildContainer := true
-
-	if shouldBuildContainer {
-
-	} else {
-		p.logger.Infof("🦘 Skipping build of target: %s", p.Name)
-
-	}
 	/*
 		if (gitState.CanDetectChanges()) {
 			if (cm.IsAffectedByDiff(gitState.ChangesSinceMainBranch))
@@ -51,5 +44,22 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider /*projec
 			}
 		}
 	*/
+
+	if shouldBuildContainer {
+		// Log.Information($"⚒️ Building container {container.Name} -> {container.GetFQImageNameAndTag()}");
+		// manifest.WithImage(container).Persist(_fileSystem, manifestFilePath);
+
+		// if (cfg.UseRemoteContainerRegistryCache)
+		// {
+		// 		_docker.DockerPull(container.GetFQImageNameAndLatestTag(), true);
+		// }
+		// _docker.DockerBuild(PathProvider.RootWorkingDirectory, cfg, cm, container, gitState.CommitSha);
+
+		// PushContainer(container, cfg);
+
+	} else {
+		p.logger.Infof("🦘 Skipping build of target: %s", p.Name)
+
+	}
 	return nil
 }

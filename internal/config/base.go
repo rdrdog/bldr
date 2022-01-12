@@ -34,9 +34,11 @@ func Load(logger *logrus.Logger) (*Base, error) {
 	if newConfig.CI {
 		logger.Info("Configuring for CI environment")
 		newConfig.Docker.IncludeTimeInImageTag = false
+		newConfig.Docker.UseRemoteContainerRegistryCache = false
 	} else {
 		logger.Info("Configuring for local environment")
 		newConfig.Docker.IncludeTimeInImageTag = true
+		newConfig.Docker.UseRemoteContainerRegistryCache = true
 		newConfig.Docker.Registry = ""
 		newConfig.Pipeline.Path = "samples/pipeline-config.yaml"
 	}
