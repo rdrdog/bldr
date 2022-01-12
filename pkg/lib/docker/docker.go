@@ -3,7 +3,6 @@ package docker
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/Redgwell/bldr/pkg/contexts"
 	"github.com/Redgwell/bldr/pkg/lib/process"
@@ -59,19 +58,33 @@ func (d *Docker) Build(dockerFilePath string, imageName string, imageTag string,
 		p.WithEnv("DOCKER_BUILDKIT=1")
 	}
 
-	_, _, err := p.
+	d.logger.Debugf("docker %s", buildArgs)
+
+	_, stdErr, err := p.
 		PipeStderrToStdout(). // buildkit sends to stderr....
 		Run()
 
 	if err != nil {
+		d.logger.Error(stdErr)
 		d.logger.Fatalf("Docker build failed: %v", err)
 	}
 }
 
-func (d *Docker) Push(imageName string, imageTag string, buildContext *contexts.BuildContext) {
+func (d *Docker) PullLatest(imageName string) {
+	args := fmt.Sprintf("pull %s:latest", imageName)
+	_, _, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
+
+	if err == nil {
+		d.logger.Infof("Docker pull successful: %s", imageName)
+	} else {
+		d.logger.Fatalf("Docker pull failed: %v", err)
+	}
+}
+
+func (d *Docker) Push(imageName string, imageTag string) {
 	containerNameWithTag := fmt.Sprintf("%s:%s", imageName, imageTag)
 	args := fmt.Sprintf("push %s", containerNameWithTag)
-	_, _, err := process.New("docker", buildContext.PathContext.RepoRootDirectory, d.logger).WithArgs(args).Run()
+	_, _, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
 
 	if err == nil {
 		d.logger.Infof("Docker push successful: %s", containerNameWithTag)
@@ -84,41 +97,35 @@ func (d *Docker) PrintDockerBuild(dockerFilePath string, imageName string, image
 	return "docker " + d.getBuildArgs(dockerFilePath, imageName, imageTag, buildContext, additionalBuildArgs)
 }
 
-func (d *Docker) GenerateImageTag(shortCommitSha string) string {
-	// Go datetime format uses: 01/02 03:04:05PM ‘06 -0700.)
-	return time.Now().UTC().Format("0602011504-") + shortCommitSha
-}
-
-func (d *Docker) IsImageAvailable(imageName string, buildContext *contexts.BuildContext) bool {
-	shortCommitSha := buildContext.GitContext.ShortCommitSha
+func (d *Docker) IsImageAvailable(imageName string, imageTag string, useRemoteContainerRegistryCache bool) bool {
 	var output string
-	if buildContext.DockerContext.UseRemoteContainerRegistryCache {
-		d.logger.Infof("Locating container '%s' for sha '%s' using docker cli", imageName, shortCommitSha)
+	if useRemoteContainerRegistryCache {
+		d.logger.Infof("Locating container '%s' for sha '%s' using docker cli", imageName, imageTag)
 		args := fmt.Sprintf(
 			"manifest inspect %s:%s",
 			imageName,
-			shortCommitSha,
+			imageTag,
 		)
 
 		var err error
-		_, _, err = process.New("docker", buildContext.PathContext.RepoRootDirectory, d.logger).
+		_, _, err = process.New("docker", ".", d.logger).
 			WithArgs(args).
 			WithSuppressedOutput().
 			Run()
 
 		if err == nil {
-			d.logger.Infof("Found container %s:%s", imageName, shortCommitSha)
+			d.logger.Infof("Found container %s:%s", imageName, imageTag)
 			return true
 		} else {
-			d.logger.Infof("Unable to find container %s:%s", imageName, shortCommitSha)
+			d.logger.Infof("Unable to find container %s:%s", imageName, imageTag)
 			return false
 		}
 
 	} else {
-		d.logger.Infof("Locating container '%s' for sha '%s' locally", imageName, shortCommitSha)
-		args := fmt.Sprintf("images ls --filter reference=%s*%s --format {{.Tag}}", imageName, shortCommitSha)
+		d.logger.Infof("Locating container '%s' for sha '%s' locally", imageName, imageTag)
+		args := fmt.Sprintf("images ls --filter reference=%s*%s --format {{.Tag}}", imageName, imageTag)
 		var err error
-		output, _, err = process.New("docker", buildContext.PathContext.RepoRootDirectory, d.logger).
+		output, _, err = process.New("docker", ".", d.logger).
 			WithArgs(args).
 			WithSuppressedOutput().
 			Run()
@@ -129,13 +136,13 @@ func (d *Docker) IsImageAvailable(imageName string, buildContext *contexts.Build
 		}
 
 		for _, line := range strings.Split(strings.TrimSpace(output), "\n") {
-			if strings.Contains(line, shortCommitSha) {
-				d.logger.Infof("Found container %s:%s locally", imageName, shortCommitSha)
+			if strings.Contains(line, imageTag) {
+				d.logger.Infof("Found container %s:%s locally", imageName, imageTag)
 				return true
 			}
 		}
 
-		d.logger.Infof("Unable to find container %s:%s locally", imageName, shortCommitSha)
+		d.logger.Infof("Unable to find container %s:%s locally", imageName, imageTag)
 		return false
 	}
 }
