@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Redgwell/bldr/internal/config"
 	"github.com/Redgwell/bldr/internal/pipeline"
+	"github.com/Redgwell/bldr/pkg/config"
 	"github.com/sirupsen/logrus"
 )
 

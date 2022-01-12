@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Redgwell/bldr/internal/config"
 	"github.com/Redgwell/bldr/internal/models"
+	"github.com/Redgwell/bldr/pkg/config"
 	"github.com/Redgwell/bldr/pkg/contexts"
 	"github.com/Redgwell/bldr/pkg/plugins"
 	"github.com/sirupsen/logrus"
@@ -59,7 +59,7 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 		yamlPath := fmt.Sprintf("$.targets[%d].%s", i, p.mode)
 		pluginConfig := pipelineCfg.LoadPluginConfig(yamlPath)
 
-		err = pluginInstance.SetConfig(p.logger, t.Name, pluginConfig)
+		err = pluginInstance.SetConfig(p.logger, t.Name, p.config, pluginConfig)
 		if err != nil {
 			return err
 		}

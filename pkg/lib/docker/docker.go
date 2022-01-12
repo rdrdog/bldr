@@ -4,35 +4,31 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Redgwell/bldr/pkg/contexts"
+	"github.com/Redgwell/bldr/pkg/config"
 	"github.com/Redgwell/bldr/pkg/lib/process"
 	"github.com/sirupsen/logrus"
 )
 
-const containerCommitShaLabel = "COMMIT_SHA"
-const containerBuildNumber = "BUILD_NUMBER"
-
 type Docker struct {
-	logger *logrus.Logger
+	configuration *config.Configuration
+	logger        *logrus.Logger
 }
 
-func New(logger *logrus.Logger) *Docker {
+func New(configuration *config.Configuration, logger *logrus.Logger) *Docker {
 	return &Docker{
-		logger: logger,
+		configuration: configuration,
+		logger:        logger,
 	}
 }
 
-func (d *Docker) getBuildArgs(dockerFilePath string, imageName string, imageTag string, buildContext *contexts.BuildContext, additionalBuildArgs []string) string {
+func (d *Docker) getBuildArgs(dockerFilePath string, imageName string, imageTag string, additionalBuildArgs []string) string {
 	var buildArgs strings.Builder
 	buildArgs.WriteString("build ")
 	buildArgs.WriteString(fmt.Sprintf("-t %s:%s ", imageName, imageTag))
 	buildArgs.WriteString(fmt.Sprintf("-t %s:latest ", imageName))
 	buildArgs.WriteString(fmt.Sprintf("--cache-from %s:latest ", imageName))
-	buildArgs.WriteString(fmt.Sprintf("--label %s=%s ", containerCommitShaLabel, buildContext.GitContext.FullCommitSha))
-	buildArgs.WriteString(fmt.Sprintf("--build-arg %s=%s ", containerCommitShaLabel, buildContext.GitContext.FullCommitSha))
-	buildArgs.WriteString(fmt.Sprintf("--build-arg %s=%s ", containerBuildNumber, buildContext.BuildNumber))
 
-	if buildContext.DockerContext.UseBuildKit {
+	if d.configuration.Docker.UseBuildKit {
 		buildArgs.WriteString("--build-arg BUILDKIT_INLINE_CACHE=1 ")
 	}
 
@@ -47,13 +43,13 @@ func (d *Docker) getBuildArgs(dockerFilePath string, imageName string, imageTag 
 	return buildArgs.String()
 }
 
-func (d *Docker) Build(dockerFilePath string, imageName string, imageTag string, buildContext *contexts.BuildContext, additionalBuildArgs []string) {
-	buildArgs := d.getBuildArgs(dockerFilePath, imageName, imageTag, buildContext, additionalBuildArgs)
+func (d *Docker) Build(dockerFilePath string, workingDirectory string, imageName string, imageTag string, additionalBuildArgs []string) {
+	buildArgs := d.getBuildArgs(dockerFilePath, imageName, imageTag, additionalBuildArgs)
 	p := process.
-		New("docker", buildContext.PathContext.RepoRootDirectory, d.logger).
+		New("docker", workingDirectory, d.logger).
 		WithArgs(buildArgs)
 
-	if buildContext.DockerContext.UseBuildKit {
+	if d.configuration.Docker.UseBuildKit {
 		d.logger.Info("Buildkit enabled")
 		p.WithEnv("DOCKER_BUILDKIT=1")
 	}
@@ -93,8 +89,8 @@ func (d *Docker) Push(imageName string, imageTag string) {
 	}
 }
 
-func (d *Docker) PrintDockerBuild(dockerFilePath string, imageName string, imageTag string, buildContext *contexts.BuildContext, additionalBuildArgs []string) string {
-	return "docker " + d.getBuildArgs(dockerFilePath, imageName, imageTag, buildContext, additionalBuildArgs)
+func (d *Docker) PrintDockerBuild(dockerFilePath string, imageName string, imageTag string, additionalBuildArgs []string) string {
+	return "docker " + d.getBuildArgs(dockerFilePath, imageName, imageTag, additionalBuildArgs)
 }
 
 func (d *Docker) IsImageAvailable(imageName string, imageTag string, useRemoteContainerRegistryCache bool) bool {

@@ -22,11 +22,13 @@ default:
     path: pipeline-config.yaml
   docker:
     useBuildKit: true
+  git:
+    mainBranchName: main
 
 local:
   docker:
     includeTimeInImageTag: true
-    useRemoteContainerRegistryCache: true
+    useRemoteContainerRegistryCache: false
     pushContainers: false
     registry: ""
 
@@ -42,6 +44,7 @@ func Load(logger *logrus.Logger) (*Configuration, error) {
 	for _, configSection := range []interface{}{
 		newConfig,
 		&newConfig.Docker,
+		&newConfig.Git,
 		&newConfig.Logging,
 		&newConfig.Pipeline,
 	} {
