@@ -19,7 +19,7 @@ func main() {
 	registry.RegisterBuiltIn()
 
 	pp := pipeline.NewPluginPipeline(logger, config)
-	err = pp.LoadPlugins(registry /*, Build|Deploy*/) // TODO: err :=
+	err = pp.InitialisePipeline(registry /*, Build|Deploy*/) // TODO: err :=
 	if err != nil {
 		logger.Fatalf("error loading plugins: %v", err)
 	}
