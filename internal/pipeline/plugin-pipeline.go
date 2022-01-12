@@ -16,23 +16,28 @@ type PluginPipeline struct {
 	logger          *logrus.Logger
 	mode            string
 	plugins         []plugins.PluginDefinition
+	registry        *plugins.Registry
 }
 
 func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
 	p.plugins = append(p.plugins, plugin)
 }
 
-func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Base) *PluginPipeline {
+func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Base, mode string) *PluginPipeline {
+	registry := plugins.NewRegistry(logger)
+	registry.RegisterBuiltIn()
+
 	pipeline := &PluginPipeline{
 		config:          baseConfig,
 		contextProvider: contexts.NewContextProvider(logger),
 		logger:          logger,
-		mode:            "build",
+		mode:            mode,
+		registry:        registry,
 	}
 	return pipeline
 }
 
-func (p *PluginPipeline) InitialisePipeline(registry *plugins.Registry) error {
+func (p *PluginPipeline) AddPipelineConfigTargets() error {
 
 	pipelineCfg, err := models.LoadPipelineConfig(p.config.Pipeline.Path)
 	if err != nil {
@@ -45,7 +50,7 @@ func (p *PluginPipeline) InitialisePipeline(registry *plugins.Registry) error {
 		// Load the PluginDefinition using the plugin registry for now
 		// Later, we could potentially support go plugins
 
-		pluginInstance, err := registry.CreateInstance(t.Build.Plugin)
+		pluginInstance, err := p.registry.CreateInstance(t.Build.Plugin)
 		if err != nil {
 			return err
 		}

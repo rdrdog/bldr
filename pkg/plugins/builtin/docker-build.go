@@ -1,7 +1,11 @@
 package builtin
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/Redgwell/bldr/pkg/contexts"
+	"github.com/Redgwell/bldr/pkg/lib/docker"
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 )
@@ -19,8 +23,21 @@ func (p *DockerBuild) SetConfig(logger *logrus.Logger, targetName string, plugin
 	return mapstructure.Decode(pluginConfig, p)
 }
 
-func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider /*projectName string, targetName string*/) error {
+func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
 	p.logger.Infof("Running docker build with config: Path: %s, Include: %v", p.Path, p.Include)
+
+	p.logger.Infof("context: %v", contextProvider.BuildContext.BuildNumber)
+
+	bc := contextProvider.BuildContext
+
+	imageTag := bc.GitContext.ShortCommitSha
+	if bc.DockerContext.IncludeTimeInTags {
+		// Go datetime format uses: 01/02 03:04:05PM ‘06 -0700.)
+		imageTag += time.Now().UTC().Format("-060201150405")
+	}
+
+	imageName := fmt.Sprintf("%s%s", bc.DockerContext.Registry, p.Name)
+	docker := docker.New(p.logger)
 
 	shouldBuildContainer := true
 	/*
@@ -46,20 +63,23 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider /*projec
 	*/
 
 	if shouldBuildContainer {
-		// Log.Information($"⚒️ Building container {container.Name} -> {container.GetFQImageNameAndTag()}");
-		// manifest.WithImage(container).Persist(_fileSystem, manifestFilePath);
 
-		// if (cfg.UseRemoteContainerRegistryCache)
-		// {
-		// 		_docker.DockerPull(container.GetFQImageNameAndLatestTag(), true);
-		// }
-		// _docker.DockerBuild(PathProvider.RootWorkingDirectory, cfg, cm, container, gitState.CommitSha);
+		p.logger.Infof("⚒️ Building container %s -> %s:%s", p.Name, imageName, imageTag)
 
-		// PushContainer(container, cfg);
+		if bc.DockerContext.UseRemoteContainerRegistryCache {
+			docker.PullLatest(imageName)
+		}
 
+		docker.Build(p.Path, imageName, imageTag, bc, nil)
+
+		if bc.DockerContext.PushContainers {
+			docker.Push(imageName, imageTag)
+			docker.Push(imageName, "latest")
+		}
+
+		contextProvider.BuildContext.ArtefactManifest.AddArtefact(p.Name, imageName)
 	} else {
 		p.logger.Infof("🦘 Skipping build of target: %s", p.Name)
-
 	}
 	return nil
 }

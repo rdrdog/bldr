@@ -28,8 +28,6 @@ func Load(logger *logrus.Logger) (*Base, error) {
 		}
 	}
 
-	newConfig.Logging.SetFormatter(logger)
-
 	// detect if we're running in CI, or local
 	if newConfig.CI {
 		logger.Info("Configuring for CI environment")
@@ -41,7 +39,10 @@ func Load(logger *logrus.Logger) (*Base, error) {
 		newConfig.Docker.UseRemoteContainerRegistryCache = true
 		newConfig.Docker.Registry = ""
 		newConfig.Pipeline.Path = "samples/pipeline-config.yaml"
+		newConfig.Logging.Level = "DEBUG"
 	}
+
+	newConfig.Logging.SetFormatter(logger)
 
 	return newConfig, nil
 }

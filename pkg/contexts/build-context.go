@@ -16,6 +16,7 @@ func CreateBuildContext( /*TODO - set paths */ ) *BuildContext {
 		DockerContext: &DockerContext{
 			UseBuildKit:                     true,
 			IncludeTimeInTags:               false,
+			PushContainers:                  false,
 			UseRemoteContainerRegistryCache: false,
 		},
 		GitContext:  &GitContext{},
@@ -31,6 +32,7 @@ type DockerContext struct {
 	UseBuildKit                     bool
 	Registry                        string
 	IncludeTimeInTags               bool
+	PushContainers                  bool
 	UseRemoteContainerRegistryCache bool
 }
 

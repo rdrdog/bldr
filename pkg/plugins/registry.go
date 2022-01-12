@@ -42,5 +42,7 @@ func (r *Registry) CreateInstance(name string) (PluginDefinition, error) {
 }
 
 func (r *Registry) RegisterBuiltIn() {
+	r.RegisterType((*builtin.BuildPathContextLoader)(nil))
 	r.RegisterType((*builtin.DockerBuild)(nil))
+	r.RegisterType((*builtin.GitContextLoader)(nil))
 }
