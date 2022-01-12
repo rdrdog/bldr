@@ -1,15 +1,28 @@
 package main
 
 import (
-	"fmt"
-
+	"github.com/Redgwell/bldr/internal/config"
 	"github.com/Redgwell/bldr/internal/pipeline"
+	"github.com/Redgwell/bldr/pkg/plugins"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	fmt.Println("Hello, World!")
+	logger := logrus.New()
+	config, err := config.Load(logger)
+	if err != nil {
+		logger.Fatal("could no initialise configuration")
+		return
+	}
 
-	pp, _ := pipeline.NewPluginPipeline() // todo - pass in config
+	registry := plugins.NewRegistry(logger)
+	registry.RegisterBuiltIn()
+
+	pp := pipeline.NewPluginPipeline(logger, config)
+	err = pp.LoadPlugins(registry /*, Build|Deploy*/) // TODO: err :=
+	if err != nil {
+		logger.Fatalf("error loading plugins: %v", err)
+	}
 	pp.Run()
 }
 
