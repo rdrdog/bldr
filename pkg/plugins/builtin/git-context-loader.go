@@ -29,6 +29,7 @@ func (p *GitContextLoader) Execute(contextProvider *contexts.ContextProvider) er
 	bc.GitContext.FullCommitSha = git.CommitSha
 	bc.GitContext.ShortCommitSha = bc.GitContext.FullCommitSha[:7]
 	bc.GitContext.MainBranchForkPoint = git.MainBranchForkPoint
+	bc.GitContext.ChangesSinceMainBranch = git.ChangesSinceMainBranch
 
 	return nil
 }
