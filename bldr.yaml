@@ -1,0 +1,19 @@
+
+default:
+  logging:
+    level: DEBUG
+  pipeline:
+    path: samples/pipeline-config.yaml
+  docker:
+    useBuildKit: true
+
+local:
+  docker:
+    includeTimeInImageTag: true
+    useRemoteContainerRegistryCache: true
+    pushContainers: false
+    registry: ""
+
+ci:
+  docker:
+    registry: "todo:set-your-container-registry"

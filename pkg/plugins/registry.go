@@ -29,7 +29,7 @@ func NewRegistry(logger *logrus.Logger) *Registry {
 func (r *Registry) RegisterType(typeInterface interface{}) {
 	t := reflect.TypeOf(typeInterface).Elem()
 	pluginName := strings.TrimPrefix(t.PkgPath(), packagePathPrefix) + "/" + t.Name()
-	r.logger.Infof("Adding plugin: %s", pluginName)
+	r.logger.Infof("🔌 adding plugin: %s", pluginName)
 	r.plugins[pluginName] = t
 }
 
