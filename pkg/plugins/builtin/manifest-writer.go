@@ -3,7 +3,6 @@ package builtin
 import (
 	"path"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/sirupsen/logrus"
@@ -23,7 +22,7 @@ func (p *ManifestWriter) SetConfig(logger *logrus.Logger, targetName string, con
 	p.config = configuration
 	p.logger = logger
 	p.Name = targetName
-	return mapstructure.Decode(pluginConfig, p)
+	return nil
 }
 
 func (p *ManifestWriter) Execute(contextProvider *contexts.ContextProvider) error {
