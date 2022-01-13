@@ -31,6 +31,10 @@ func (p *ManifestWriter) Execute(contextProvider *contexts.ContextProvider) erro
 	manifestInstance := &manifest{
 		BuildNumber: bc.BuildNumber,
 		Artefacts:   bc.ArtefactManifest.Artefacts,
+		MetaData: metaData{
+			BldrVersion:     config.BldrAppVersion,
+			ManifestVersion: config.ManifestVersion,
+		},
 	}
 	manifestInstance.Repo.BranchName = bc.GitContext.BranchName
 	manifestInstance.Repo.CommitSha = bc.GitContext.FullCommitSha
@@ -60,4 +64,10 @@ type manifest struct {
 		CommitSha  string
 	}
 	Artefacts map[string]string
+	MetaData  metaData
+}
+
+type metaData struct {
+	BldrVersion     string
+	ManifestVersion string
 }
