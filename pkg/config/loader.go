@@ -2,12 +2,12 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 
 	"github.com/caarlos0/env"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/internal/utils"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
 )
 
@@ -84,7 +84,7 @@ func loadOrGenerateBldrConfig(logger *logrus.Logger) (map[string]interface{}, er
 	// If our bldr config file doesn't exist, generate it
 	if !exists {
 		logger.Infof("no bldr config file found at %s - generating defaults", bldrConfigFileName)
-		err = ioutil.WriteFile(bldrConfigFileName, []byte(bldrConfigDefaults), 0777)
+		err = afero.WriteFile(Appfs, bldrConfigFileName, []byte(bldrConfigDefaults), 0777)
 		if err != nil {
 			logger.Errorf("error writing bldr config file to %s: %v", bldrConfigFileName, err)
 			return nil, err
@@ -92,7 +92,7 @@ func loadOrGenerateBldrConfig(logger *logrus.Logger) (map[string]interface{}, er
 	}
 
 	// Read the bldr config:
-	data, err := ioutil.ReadFile(bldrConfigFileName)
+	data, err := afero.ReadFile(Appfs, bldrConfigFileName)
 	if err != nil {
 		logger.Errorf("error reading bldr config file from %s: %v", bldrConfigFileName, err)
 		return nil, err

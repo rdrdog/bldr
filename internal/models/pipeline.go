@@ -2,9 +2,10 @@ package models
 
 import (
 	"bytes"
-	"io/ioutil"
 
 	"github.com/goccy/go-yaml"
+	"github.com/rdrdog/bldr/pkg/config"
+	"github.com/spf13/afero"
 )
 
 type PipelineConfig struct {
@@ -32,7 +33,7 @@ func LoadPipelineConfig(configFilePath string) (*PipelineConfig, error) {
 	cfg := PipelineConfig{}
 
 	var err error
-	cfg.source, err = ioutil.ReadFile(configFilePath)
+	cfg.source, err = afero.ReadFile(config.Appfs, configFilePath)
 	if err != nil {
 		// TODO log
 		return nil, err
