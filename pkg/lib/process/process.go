@@ -65,14 +65,14 @@ func (p *Process) run() (string, string, error) {
 	command := cmd.NewCmd(p.cmd, strings.Split(p.args, " ")...)
 	command.Dir = p.workingDir
 	command.Env = append(os.Environ(), p.env...)
-	p.log.Debugf("Running command %s %s", p.cmd, p.args)
+	p.log.Debugf("running command %s %s", p.cmd, p.args)
 
 	statusChan := command.Start()
 	p.logCommandOutput(command)
 
 	// Block waiting for command to exit
 	finalStatus := <-statusChan
-	p.log.Debugf("Exit code from process: %d, %v", finalStatus.Exit, finalStatus.Error)
+	p.log.Debugf("exit code from process: %d, %v", finalStatus.Exit, finalStatus.Error)
 
 	var err error
 	if finalStatus.Exit != 0 {

@@ -122,7 +122,7 @@ func (g *Git) LoadRepoInformation() *Git {
 	g.logger.
 		WithField("commitSha", g.CommitSha).
 		WithField("branchName", g.BranchName).
-		WithField("mainBranchForkPoint", g.MainBranchForkPoint).
+		WithField("MainBranchForkPoint", g.MainBranchForkPoint).
 		Info("Loaded repo information")
 
 	return g
