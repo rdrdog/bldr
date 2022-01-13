@@ -23,7 +23,7 @@ func (p *GitContextLoader) SetConfig(logger *logrus.Logger, targetName string, c
 
 func (p *GitContextLoader) Execute(contextProvider *contexts.ContextProvider) error {
 	bc := contextProvider.BuildContext
-	p.logger.Infof("Loading git context for path %s", bc.PathContext.RepoRootDirectory)
+	p.logger.Infof("loading git context for path %s", bc.PathContext.RepoRootDirectory)
 
 	git := git.New(p.logger, p.configuration.Git.MainBranchName, bc.PathContext.RepoRootDirectory)
 	git.LoadRepoInformation()
@@ -31,7 +31,7 @@ func (p *GitContextLoader) Execute(contextProvider *contexts.ContextProvider) er
 	bc.GitContext.BranchName = git.BranchName
 	bc.GitContext.FullCommitSha = git.CommitSha
 	bc.GitContext.ShortCommitSha = git.CommitSha[:7]
-	bc.GitContext.MainBranchForkPoint = git.MainBranchForkPoint
+	bc.GitContext.MainBranchForkPointShort = git.MainBranchForkPoint[:7]
 	bc.GitContext.ChangesSinceMainBranch = git.ChangesSinceMainBranch
 
 	return nil

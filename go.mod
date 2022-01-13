@@ -15,7 +15,6 @@ require (
 
 require (
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/kisielk/godepgraph v0.0.0-20190626013829-57a7e4a651a9 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/spf13/afero v1.8.0
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect

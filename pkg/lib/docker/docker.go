@@ -50,11 +50,11 @@ func (d *Docker) Build(dockerFilePath string, workingDirectory string, imageName
 		WithArgs(buildArgs)
 
 	if d.configuration.Docker.UseBuildKit {
-		d.logger.Info("Buildkit enabled")
+		d.logger.Info("🐳 buildkit enabled")
 		p.WithEnv("DOCKER_BUILDKIT=1")
 	}
 
-	d.logger.Debugf("docker %s", buildArgs)
+	d.logger.Debugf("🐳 docker %s", buildArgs)
 
 	_, stdErr, err := p.
 		PipeStderrToStdout(). // buildkit sends to stderr....
@@ -62,7 +62,7 @@ func (d *Docker) Build(dockerFilePath string, workingDirectory string, imageName
 
 	if err != nil {
 		d.logger.Error(stdErr)
-		d.logger.Fatalf("Docker build failed: %v", err)
+		d.logger.Fatalf("docker build failed: %v", err)
 	}
 }
 
@@ -71,9 +71,9 @@ func (d *Docker) PullLatest(imageName string) {
 	_, _, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
 
 	if err == nil {
-		d.logger.Infof("Docker pull successful: %s", imageName)
+		d.logger.Infof("🐳 docker pull successful: %s", imageName)
 	} else {
-		d.logger.Fatalf("Docker pull failed: %v", err)
+		d.logger.Fatalf("docker pull failed: %v", err)
 	}
 }
 
@@ -83,9 +83,9 @@ func (d *Docker) Push(imageName string, imageTag string) {
 	_, _, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
 
 	if err == nil {
-		d.logger.Infof("Docker push successful: %s", containerNameWithTag)
+		d.logger.Infof("🐳 docker push successful: %s", containerNameWithTag)
 	} else {
-		d.logger.Fatalf("Docker push failed: %v", err)
+		d.logger.Fatalf("docker push failed: %v", err)
 	}
 }
 
@@ -96,7 +96,7 @@ func (d *Docker) PrintDockerBuild(dockerFilePath string, imageName string, image
 func (d *Docker) IsImageAvailable(imageName string, imageTag string, useRemoteContainerRegistryCache bool) bool {
 	var output string
 	if useRemoteContainerRegistryCache {
-		d.logger.Infof("Locating container '%s' for sha '%s' using docker cli", imageName, imageTag)
+		d.logger.Infof("locating container '%s' for sha '%s' using docker cli", imageName, imageTag)
 		args := fmt.Sprintf(
 			"manifest inspect %s:%s",
 			imageName,
@@ -110,15 +110,15 @@ func (d *Docker) IsImageAvailable(imageName string, imageTag string, useRemoteCo
 			Run()
 
 		if err == nil {
-			d.logger.Infof("Found container %s:%s", imageName, imageTag)
+			d.logger.Infof("found container %s:%s", imageName, imageTag)
 			return true
 		} else {
-			d.logger.Infof("Unable to find container %s:%s", imageName, imageTag)
+			d.logger.Infof("unable to find container %s:%s", imageName, imageTag)
 			return false
 		}
 
 	} else {
-		d.logger.Infof("Locating container '%s' for sha '%s' locally", imageName, imageTag)
+		d.logger.Infof("locating container '%s' for sha '%s' locally", imageName, imageTag)
 		args := fmt.Sprintf("images ls --filter reference=%s*%s --format {{.Tag}}", imageName, imageTag)
 		var err error
 		output, _, err = process.New("docker", ".", d.logger).
@@ -127,18 +127,18 @@ func (d *Docker) IsImageAvailable(imageName string, imageTag string, useRemoteCo
 			Run()
 
 		if err != nil {
-			d.logger.Infof("Unable to find container %s locally", imageName)
+			d.logger.Infof("unable to find container %s locally", imageName)
 			return false
 		}
 
 		for _, line := range strings.Split(strings.TrimSpace(output), "\n") {
 			if strings.Contains(line, imageTag) {
-				d.logger.Infof("Found container %s:%s locally", imageName, imageTag)
+				d.logger.Infof("found container %s:%s locally", imageName, imageTag)
 				return true
 			}
 		}
 
-		d.logger.Infof("Unable to find container %s:%s locally", imageName, imageTag)
+		d.logger.Infof("unable to find container %s:%s locally", imageName, imageTag)
 		return false
 	}
 }
