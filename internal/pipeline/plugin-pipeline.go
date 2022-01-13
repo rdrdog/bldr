@@ -48,7 +48,7 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 	}
 
 	for i, t := range pipelineCfg.Targets {
-		p.logger.Infof("Initialising target: %v using %v\n", t.Name, t.Build.Plugin)
+		p.logger.Infof("initialising target: %v using %v\n", t.Name, t.Build.Plugin)
 		// Load the PluginDefinition using the plugin registry for now
 		// Later, we could potentially support go plugins
 

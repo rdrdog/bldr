@@ -25,7 +25,7 @@ func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, targetName str
 
 func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvider) error {
 	pc := contextProvider.BuildContext.PathContext
-	p.logger.Info("Loading path context")
+	p.logger.Info("loading path context")
 
 	var err error
 	pc.RepoRootDirectory, err = os.Getwd()
@@ -34,7 +34,7 @@ func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvid
 		return err
 	}
 
-	p.logger.Debugf("Repo root directory determined to be %s", pc.RepoRootDirectory)
+	p.logger.Debugf("repo root directory determined to be %s", pc.RepoRootDirectory)
 
 	pc.BuildArtefactDirectory = path.Join(pc.RepoRootDirectory, BuildArtefactDirectoryName)
 

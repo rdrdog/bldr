@@ -22,11 +22,12 @@ type ArtefactManifest struct {
 }
 
 type GitContext struct {
-	FullCommitSha          string
-	ShortCommitSha         string
-	BranchName             string
-	MainBranchForkPoint    string
-	ChangesSinceMainBranch []string
+	FullCommitSha            string
+	ShortCommitSha           string
+	BranchName               string
+	MainBranchForkPoint      string
+	MainBranchForkPointShort string
+	ChangesSinceMainBranch   []string
 }
 
 type PathContext struct {
