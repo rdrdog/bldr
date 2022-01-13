@@ -1,5 +1,5 @@
 # bldr
-
+[![Build](https://github.com/rdrdog/bldr/actions/workflows/build.yaml/badge.svg)](https://github.com/rdrdog/bldr/actions/workflows/build.yaml)
 ## Plugins
 
 - Some default initial plugins:
