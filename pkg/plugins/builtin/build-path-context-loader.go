@@ -4,23 +4,26 @@ import (
 	"os"
 	"path"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
 
 const BuildArtefactDirectoryName = "build-artefacts"
+const PipelineConfigFileName = "pipeline-config.yaml"
 
 type BuildPathContextLoader struct {
-	logger *logrus.Logger
-	Name   string
+	configuration *config.Configuration
+	logger        *logrus.Logger
+	Name          string
 }
 
 func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
+	p.configuration = configuration
 	p.logger = logger
 	p.Name = targetName
-	return mapstructure.Decode(pluginConfig, p)
+	return nil
 }
 
 func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvider) error {
@@ -44,6 +47,10 @@ func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvid
 		p.logger.Fatalf("error creating artefact directory at %s: %v", pc.BuildArtefactDirectory, err)
 		return err
 	}
+
+	// Copy the pipeline-config.yaml to the artefact directory
+	pipelineConfigDst := path.Join(pc.BuildArtefactDirectory, PipelineConfigFileName)
+	utils.CopyFile(p.configuration.Pipeline.Path, pipelineConfigDst)
 
 	return nil
 }

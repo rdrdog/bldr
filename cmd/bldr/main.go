@@ -8,13 +8,13 @@ import (
 
 func main() {
 	logger := logrus.New()
-	config, err := config.Load(logger)
+	conf, err := config.Load(logger)
 	if err != nil {
 		logger.Fatalf("could no initialise configuration: %v", err)
 		return
 	}
 
-	pp := pipeline.NewPluginPipeline(logger, config, "build")
+	pp := pipeline.NewPluginPipeline(logger, conf, config.PipelineOperationModeBuild)
 
 	pp.AddDefaultPreBuildTargets()
 

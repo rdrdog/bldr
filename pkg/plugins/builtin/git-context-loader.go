@@ -1,7 +1,6 @@
 package builtin
 
 import (
-	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/rdrdog/bldr/pkg/lib/git"
@@ -18,7 +17,7 @@ func (p *GitContextLoader) SetConfig(logger *logrus.Logger, targetName string, c
 	p.configuration = configuration
 	p.logger = logger
 	p.Name = targetName
-	return mapstructure.Decode(pluginConfig, p)
+	return nil
 }
 
 func (p *GitContextLoader) Execute(contextProvider *contexts.ContextProvider) error {
