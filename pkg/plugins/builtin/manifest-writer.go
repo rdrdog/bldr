@@ -1,13 +1,13 @@
 package builtin
 
 import (
-	"io/ioutil"
 	"path"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
 )
 
@@ -45,7 +45,7 @@ func (p *ManifestWriter) Execute(contextProvider *contexts.ContextProvider) erro
 	}
 
 	manifestFilePath := path.Join(bc.PathContext.BuildArtefactDirectory, ManifestFileName)
-	err = ioutil.WriteFile(manifestFilePath, manifestData, 0777)
+	err = afero.WriteFile(config.Appfs, manifestFilePath, manifestData, 0777)
 	if err != nil {
 		p.logger.Errorf("error writing manifest file to %s: %v", manifestFilePath, err)
 		return err
