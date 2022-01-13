@@ -42,7 +42,7 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
 	imageName := fmt.Sprintf("%s%s", p.configuration.Docker.Registry, p.Name)
 	docker := docker.New(p.configuration, p.logger)
 
-	if !p.determineShouldBuildContainer(bc, docker, imageName, imageTag) {
+	if !p.shouldBuildContainer(bc, docker, imageName, imageTag) {
 		p.logger.Infof("🦘 skipping build of target: %s", p.Name)
 
 		return nil
@@ -89,7 +89,7 @@ func (p *DockerBuild) isAffectedByDiff(diffFilePaths []string) bool {
 	return false
 }
 
-func (p *DockerBuild) determineShouldBuildContainer(bc *contexts.BuildContext, docker *docker.Docker, imageName string, imageTag string) bool {
+func (p *DockerBuild) shouldBuildContainer(bc *contexts.BuildContext, docker *docker.Docker, imageName string, imageTag string) bool {
 	if !bc.GitContext.CanDetectChanges() {
 		p.logger.Info("git context not in a state to detect changes - build is required")
 		return true
