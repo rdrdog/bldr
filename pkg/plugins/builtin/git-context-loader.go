@@ -1,10 +1,10 @@
 package builtin
 
 import (
-	"github.com/Redgwell/bldr/pkg/config"
-	"github.com/Redgwell/bldr/pkg/contexts"
-	"github.com/Redgwell/bldr/pkg/lib/git"
 	"github.com/mitchellh/mapstructure"
+	"github.com/rdrdog/bldr/pkg/config"
+	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/lib/git"
 	"github.com/sirupsen/logrus"
 )
 

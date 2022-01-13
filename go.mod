@@ -1,4 +1,4 @@
-module github.com/Redgwell/bldr
+module github.com/rdrdog/bldr
 
 go 1.17
 

@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Redgwell/bldr/pkg/plugins/builtin"
+	"github.com/rdrdog/bldr/pkg/plugins/builtin"
 	"github.com/sirupsen/logrus"
 )
 
 // Build in packages are referred to without the fully qualified package path
-const packagePathPrefix = "github.com/Redgwell/bldr/pkg/plugins/"
+const packagePathPrefix = "github.com/rdrdog/bldr/pkg/plugins/"
 
 type Registry struct {
 	logger  *logrus.Logger
@@ -45,4 +45,5 @@ func (r *Registry) RegisterBuiltIn() {
 	r.RegisterType((*builtin.BuildPathContextLoader)(nil))
 	r.RegisterType((*builtin.DockerBuild)(nil))
 	r.RegisterType((*builtin.GitContextLoader)(nil))
+	r.RegisterType((*builtin.ManifestWriter)(nil))
 }

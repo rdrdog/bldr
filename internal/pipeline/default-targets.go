@@ -1,6 +1,6 @@
 package pipeline
 
-import "github.com/Redgwell/bldr/pkg/plugins/builtin"
+import "github.com/rdrdog/bldr/pkg/plugins/builtin"
 
 func (p *PluginPipeline) AddDefaultPreBuildTargets() error {
 	buildPathContextLoader := &builtin.BuildPathContextLoader{}
@@ -10,6 +10,14 @@ func (p *PluginPipeline) AddDefaultPreBuildTargets() error {
 	gitContextLoader := &builtin.GitContextLoader{}
 	gitContextLoader.SetConfig(p.logger, "Git context loader", p.config, nil)
 	p.addPlugin(gitContextLoader)
+
+	return nil
+}
+
+func (p *PluginPipeline) AddDefaultPostBuildTargets() error {
+	manifestWriter := &builtin.ManifestWriter{}
+	manifestWriter.SetConfig(p.logger, "Manifest writer", p.config, nil)
+	p.addPlugin(manifestWriter)
 
 	return nil
 }

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Redgwell/bldr/pkg/config"
-	"github.com/Redgwell/bldr/pkg/contexts"
-	"github.com/Redgwell/bldr/pkg/lib/docker"
 	"github.com/mitchellh/mapstructure"
+	"github.com/rdrdog/bldr/pkg/config"
+	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/lib/docker"
 	"github.com/sirupsen/logrus"
 )
 
@@ -37,7 +37,7 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
 	imageTag := bc.GitContext.ShortCommitSha
 	if p.configuration.Docker.IncludeTimeInImageTag {
 		// Go datetime format uses: 01/02 03:04:05PM ‘06 -0700.)
-		imageTag += time.Now().UTC().Format("-060201150405")
+		imageTag += time.Now().UTC().Format("-060102150405")
 	}
 
 	imageName := fmt.Sprintf("%s%s", p.configuration.Docker.Registry, p.Name)
@@ -88,7 +88,7 @@ func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
 			p.logger.Infof("⏭  skipping container push for %s", imageName)
 		}
 
-		bc.ArtefactManifest.AddArtefact(p.Name, imageName)
+		bc.ArtefactManifest.AddArtefact(p.Name, fmt.Sprintf("%s:%s", imageName, imageTag))
 	} else {
 		p.logger.Infof("🦘 Skipping build of target: %s", p.Name)
 	}

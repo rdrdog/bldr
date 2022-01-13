@@ -2,12 +2,13 @@ package pipeline
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 
-	"github.com/Redgwell/bldr/internal/models"
-	"github.com/Redgwell/bldr/pkg/config"
-	"github.com/Redgwell/bldr/pkg/contexts"
-	"github.com/Redgwell/bldr/pkg/plugins"
+	"github.com/rdrdog/bldr/internal/models"
+	"github.com/rdrdog/bldr/pkg/config"
+	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/plugins"
 	"github.com/sirupsen/logrus"
 )
 
@@ -74,11 +75,13 @@ func (p *PluginPipeline) Run() error {
 	pipelineStart := time.Now()
 
 	for _, plugin := range p.plugins {
+		pluginName := reflect.TypeOf(plugin).Elem().Name()
+		p.logger.Infof("🚀 running plugin %s", pluginName)
 		start := time.Now()
 
 		err := plugin.Execute(p.contextProvider)
 
-		p.logger.Infof("⏳ plugin took %v seconds", time.Since(start).Seconds())
+		p.logger.Infof("⏳ plugin %s took %v seconds", pluginName, time.Since(start).Seconds())
 
 		if err != nil {
 

@@ -1,8 +1,8 @@
 package plugins
 
 import (
-	"github.com/Redgwell/bldr/pkg/config"
-	"github.com/Redgwell/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/config"
+	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/sirupsen/logrus"
 )
 
