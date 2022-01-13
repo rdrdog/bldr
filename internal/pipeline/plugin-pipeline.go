@@ -25,7 +25,7 @@ func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
 	p.plugins = append(p.plugins, plugin)
 }
 
-func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, mode string) *PluginPipeline {
+func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, pipelineOperationMode string) *PluginPipeline {
 	registry := plugins.NewRegistry(logger)
 	registry.RegisterBuiltIn()
 
@@ -33,7 +33,7 @@ func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, 
 		config:          baseConfig,
 		contextProvider: contexts.NewContextProvider(logger),
 		logger:          logger,
-		mode:            mode,
+		mode:            pipelineOperationMode,
 		registry:        registry,
 	}
 	return pipeline
@@ -48,11 +48,22 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 	}
 
 	for i, t := range pipelineCfg.Targets {
-		p.logger.Infof("initialising target: %v using %v\n", t.Name, t.Build.Plugin)
+		var pluginName string
+
+		switch p.mode {
+		case config.PipelineOperationModeBuild:
+			pluginName = t.Build.Plugin
+		case config.PipelineOperationModeDeploy:
+			pluginName = t.Deploy.Plugin
+		default:
+			return fmt.Errorf("unexpected operation mode: '%s'", p.mode)
+		}
+
+		p.logger.Infof("initialising target: %v using %v\n", t.Name, pluginName)
 		// Load the PluginDefinition using the plugin registry for now
 		// Later, we could potentially support go plugins
 
-		pluginInstance, err := p.registry.CreateInstance(t.Build.Plugin)
+		pluginInstance, err := p.registry.CreateInstance(pluginName)
 		if err != nil {
 			return err
 		}

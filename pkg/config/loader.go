@@ -5,7 +5,6 @@ import (
 
 	"github.com/caarlos0/env"
 	"github.com/mitchellh/mapstructure"
-	"github.com/rdrdog/bldr/internal/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
@@ -75,7 +74,7 @@ func Load(logger *logrus.Logger) (*Configuration, error) {
 }
 
 func loadOrGenerateBldrConfig(logger *logrus.Logger) (map[string]interface{}, error) {
-	exists, err := utils.FileExists(bldrConfigFileName)
+	exists, err := afero.Exists(Appfs, bldrConfigFileName)
 	if err != nil {
 		logger.Errorf("error checking if bldr config file exists at %s: %v", bldrConfigFileName, err)
 		return nil, err

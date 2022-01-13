@@ -1,22 +1,8 @@
 # bldr
 
-
-## Config
-- Support .bldrrc for setting repo defaults
-  - Alternatively, these could just go in the pipeline-config.yaml ?
-  - Main branch name
-  - Container registry
-
 ## Plugins
 
 - Some default initial plugins:
-  - build:
-    - Init artefact directory (and copy pipeline config)
-    - DockerLogin
-    - EnsureDeploymentBaseExists (?)
-    - Manifest writer (after all pipeline plugins have run)
-    - DeploymentContainer builder
-
   - deploy
     - DockerRun
     - K8sDeploy
