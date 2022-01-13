@@ -30,7 +30,8 @@ type GitContext struct {
 }
 
 type PathContext struct {
-	RepoRootDirectory string
+	RepoRootDirectory      string
+	BuildArtefactDirectory string
 }
 
 func (am *ArtefactManifest) AddArtefact(targetName string, artefactPath string) {

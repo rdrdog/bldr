@@ -19,4 +19,5 @@ secrets
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+build-artefacts
 samples/examples

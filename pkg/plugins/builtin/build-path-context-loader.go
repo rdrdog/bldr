@@ -2,12 +2,15 @@ package builtin
 
 import (
 	"os"
+	"path"
 
-	"github.com/Redgwell/bldr/pkg/config"
-	"github.com/Redgwell/bldr/pkg/contexts"
 	"github.com/mitchellh/mapstructure"
+	"github.com/rdrdog/bldr/pkg/config"
+	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/sirupsen/logrus"
 )
+
+const BuildArtefactDirectoryName = "build-artefacts"
 
 type BuildPathContextLoader struct {
 	logger *logrus.Logger
@@ -28,8 +31,19 @@ func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvid
 	pc.RepoRootDirectory, err = os.Getwd()
 	if err != nil {
 		p.logger.Fatal("could not load working directory in build path context loader")
+		return err
 	}
 
 	p.logger.Debugf("Repo root directory determined to be %s", pc.RepoRootDirectory)
-	return err
+
+	pc.BuildArtefactDirectory = path.Join(pc.RepoRootDirectory, BuildArtefactDirectoryName)
+
+	os.RemoveAll(pc.BuildArtefactDirectory)
+	err = os.Mkdir(pc.BuildArtefactDirectory, 0755)
+	if err != nil {
+		p.logger.Fatalf("error creating artefact directory at %s: %v", pc.BuildArtefactDirectory, err)
+		return err
+	}
+
+	return nil
 }
