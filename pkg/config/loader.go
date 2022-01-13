@@ -27,13 +27,16 @@ default:
 local:
   docker:
     includeTimeInImageTag: true
-    useRemoteContainerRegistryCache: false
     pushContainers: false
     registry: ""
+    useRemoteContainerRegistryCache: false
 
 ci:
   docker:
+    includeTimeInImageTag: false
+    pushContainers: true
     registry: "todo:set-your-container-registry"
+    useRemoteContainerRegistryCache: true
 `
 
 func Load(logger *logrus.Logger) (*Configuration, error) {
