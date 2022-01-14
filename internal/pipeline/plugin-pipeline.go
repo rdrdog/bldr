@@ -47,31 +47,32 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 		return err
 	}
 
-	for i, t := range pipelineCfg.Targets {
-		var pluginName string
+	var stages []models.Stage
 
-		switch p.mode {
-		case config.PipelineOperationModeBuild:
-			pluginName = t.Build.Plugin
-		case config.PipelineOperationModeDeploy:
-			pluginName = t.Deploy.Plugin
-		default:
-			return fmt.Errorf("unexpected operation mode: '%s'", p.mode)
-		}
+	switch p.mode {
+	case config.PipelineOperationModeBuild:
+		stages = pipelineCfg.Build.Stages
+	case config.PipelineOperationModeDeploy:
+		stages = pipelineCfg.Deploy.Stages
+	default:
+		return fmt.Errorf("unexpected operation mode: '%s'", p.mode)
+	}
 
-		p.logger.Infof("initialising target: %v using %v\n", t.Name, pluginName)
+	for i, s := range stages {
+
+		p.logger.Infof("initialising target: %v using %v\n", s.Name, s.Plugin)
 		// Load the PluginDefinition using the plugin registry for now
 		// Later, we could potentially support go plugins
 
-		pluginInstance, err := p.registry.CreateInstance(pluginName)
+		pluginInstance, err := p.registry.CreateInstance(s.Plugin)
 		if err != nil {
 			return err
 		}
 
-		yamlPath := fmt.Sprintf("$.targets[%d].%s", i, p.mode)
+		yamlPath := fmt.Sprintf("$.%s.stages[%d].params", p.mode, i)
 		pluginConfig := pipelineCfg.LoadPluginConfig(yamlPath)
 
-		err = pluginInstance.SetConfig(p.logger, t.Name, p.config, pluginConfig)
+		err = pluginInstance.SetConfig(p.logger, s.Name, p.config, pluginConfig)
 		if err != nil {
 			return err
 		}

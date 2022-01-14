@@ -9,24 +9,19 @@ import (
 )
 
 type PipelineConfig struct {
-	Targets []Target
-	source  []byte
+	Build struct {
+		Stages []Stage
+	}
+	Deploy struct {
+		Stages []Stage
+	}
+	source []byte
 }
 
-type Target struct {
+type Stage struct {
 	Name   string
-	Build  BuildTarget
-	Deploy DeployTarget
-}
-
-type BuildTarget struct {
-	Plugin  string
-	Path    string
-	Include []string
-}
-
-type DeployTarget struct {
 	Plugin string
+	Params map[string]interface{}
 }
 
 func LoadPipelineConfig(configFilePath string) (*PipelineConfig, error) {
