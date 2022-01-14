@@ -24,9 +24,9 @@ func (p *ManifestWriter) SetConfig(logger *logrus.Logger, configuration *config.
 	return nil
 }
 
-func (p *ManifestWriter) Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error {
+func (p *ManifestWriter) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
 
-	bc := contextProvider.BuildContext
+	bc := contextProvider.GetBuildContext()
 	manifestInstance := &manifest{
 		BuildNumber: bc.BuildNumber,
 		Artefacts:   bc.ArtefactManifest.Artefacts,

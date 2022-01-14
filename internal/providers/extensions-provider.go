@@ -1,18 +1,19 @@
-package extensions
+package providers
 
 import (
 	"strings"
 
 	"github.com/rdrdog/bldr/pkg/config"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/rdrdog/bldr/pkg/extensions/builtin"
 	"github.com/sirupsen/logrus"
 )
 
-type ExtensionsProvider struct {
-	SecretLoader  SecretsLoader
+type DefaultExtensionsProvider struct {
+	secretLoader  extensions.SecretLoader
 	configuration *config.Configuration
 	logger        *logrus.Logger
-	registry      *config.Registry
+	registry      *Registry
 }
 
 type ExtensionDefinition struct {
@@ -20,18 +21,18 @@ type ExtensionDefinition struct {
 	Params     map[string]interface{}
 }
 
-func NewExtensionsProvider(logger *logrus.Logger, configuration *config.Configuration, registry *config.Registry) *ExtensionsProvider {
+func NewExtensionsProvider(logger *logrus.Logger, configuration *config.Configuration, registry *Registry) *DefaultExtensionsProvider {
 
-	return &ExtensionsProvider{
+	return &DefaultExtensionsProvider{
 		configuration: configuration,
 		logger:        logger,
 		registry:      registry,
-		SecretLoader:  &builtin.NullSecretLoader{},
+		secretLoader:  &builtin.NullSecretLoader{},
 	}
 }
 
-func (e *ExtensionsProvider) LoadExtensions(extensions map[string]ExtensionDefinition) error {
-	for key, value := range extensions {
+func (e *DefaultExtensionsProvider) LoadExtensions(defs map[string]ExtensionDefinition) error {
+	for key, value := range defs {
 
 		e.logger.Infof("Loading extension %s as %s", key, value.Definition)
 
@@ -43,8 +44,8 @@ func (e *ExtensionsProvider) LoadExtensions(extensions map[string]ExtensionDefin
 				return err
 			}
 
-			e.SecretLoader = instance.(SecretsLoader)
-			err = e.SecretLoader.SetConfig(e.logger, e.configuration, value.Params)
+			e.secretLoader = instance.(extensions.SecretLoader)
+			err = e.secretLoader.SetConfig(e.logger, e.configuration, value.Params)
 			if err != nil {
 				e.logger.Errorf("failed to load secret loader extension: %v", err)
 				return err
@@ -53,4 +54,8 @@ func (e *ExtensionsProvider) LoadExtensions(extensions map[string]ExtensionDefin
 	}
 
 	return nil
+}
+
+func (p *DefaultExtensionsProvider) GetSecretLoader() extensions.SecretLoader {
+	return p.secretLoader
 }

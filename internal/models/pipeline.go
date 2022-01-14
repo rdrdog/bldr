@@ -4,18 +4,18 @@ import (
 	"bytes"
 
 	"github.com/goccy/go-yaml"
+	"github.com/rdrdog/bldr/internal/providers"
 	"github.com/rdrdog/bldr/pkg/config"
-	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/spf13/afero"
 )
 
 type PipelineConfig struct {
 	Build struct {
-		Extensions map[string]extensions.ExtensionDefinition
+		Extensions map[string]providers.ExtensionDefinition
 		Stages     []Stage
 	}
 	Deploy struct {
-		Extensions map[string]extensions.ExtensionDefinition
+		Extensions map[string]providers.ExtensionDefinition
 		Stages     []Stage
 	}
 	source []byte

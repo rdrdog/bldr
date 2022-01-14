@@ -30,8 +30,8 @@ func (p *DockerBuild) SetConfig(logger *logrus.Logger, configuration *config.Con
 	return mapstructure.Decode(pluginConfig, p)
 }
 
-func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error {
-	bc := contextProvider.BuildContext
+func (p *DockerBuild) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+	bc := contextProvider.GetBuildContext()
 
 	imageTag := bc.GitContext.ShortCommitSha
 	if p.configuration.Docker.IncludeTimeInImageTag {

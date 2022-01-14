@@ -6,48 +6,33 @@ import (
 	"time"
 
 	"github.com/rdrdog/bldr/internal/models"
+	"github.com/rdrdog/bldr/internal/providers"
 	"github.com/rdrdog/bldr/pkg/config"
-	"github.com/rdrdog/bldr/pkg/contexts"
-	"github.com/rdrdog/bldr/pkg/extensions"
-	builtinExtensions "github.com/rdrdog/bldr/pkg/extensions/builtin"
 	"github.com/rdrdog/bldr/pkg/plugins"
-	builtinPlugins "github.com/rdrdog/bldr/pkg/plugins/builtin"
 	"github.com/sirupsen/logrus"
 )
 
 type PluginPipeline struct {
 	config             *config.Configuration
-	contextProvider    *contexts.ContextProvider
-	extensionsProvider *extensions.ExtensionsProvider
+	contextProvider    *providers.DefaultContextProvider
+	extensionsProvider *providers.DefaultExtensionsProvider
 	logger             *logrus.Logger
 	mode               string
 	plugins            []plugins.PluginDefinition
-	registry           *config.Registry
+	registry           *providers.Registry
 }
 
 func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
 	p.plugins = append(p.plugins, plugin)
 }
 
-// TODO - move this
-func registerBuiltInPlugins(registry *config.Registry) {
-
-	registry.RegisterType((*builtinPlugins.BuildPathContextLoader)(nil))
-	registry.RegisterType((*builtinPlugins.DockerBuild)(nil))
-	registry.RegisterType((*builtinPlugins.GitContextLoader)(nil))
-	registry.RegisterType((*builtinPlugins.ManifestWriter)(nil))
-	registry.RegisterType((*builtinExtensions.NullSecretLoader)(nil))
-
-}
-
 func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, pipelineOperationMode string) *PluginPipeline {
-	registry := config.NewRegistry(logger)
-	registerBuiltInPlugins(registry)
+	registry := providers.NewRegistry(logger)
 
 	pipeline := &PluginPipeline{
 		config:             baseConfig,
-		contextProvider:    contexts.NewContextProvider(logger),
-		extensionsProvider: extensions.NewExtensionsProvider(logger, baseConfig, registry),
+		contextProvider:    providers.NewContextProvider(logger),
+		extensionsProvider: providers.NewExtensionsProvider(logger, baseConfig, registry),
 		logger:             logger,
 		mode:               pipelineOperationMode,
 		registry:           registry,

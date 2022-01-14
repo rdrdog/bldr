@@ -27,7 +27,7 @@ func (p *DockerRun) SetConfig(logger *logrus.Logger, configuration *config.Confi
 	return mapstructure.Decode(pluginConfig, p)
 }
 
-func (p *DockerRun) Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error {
+func (p *DockerRun) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
 	//dc := contextProvider.DeployContext
 
 	/*
