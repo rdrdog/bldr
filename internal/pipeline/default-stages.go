@@ -2,7 +2,7 @@ package pipeline
 
 import "github.com/rdrdog/bldr/pkg/plugins/builtin"
 
-func (p *PluginPipeline) AddDefaultPreBuildTargets() {
+func (p *PluginPipeline) AddDefaultPreBuildStages() {
 	buildPathContextLoader := &builtin.BuildPathContextLoader{}
 	buildPathContextLoader.SetConfig(p.logger, "Build path context loader", p.config, nil)
 	p.addPlugin(buildPathContextLoader)
@@ -12,16 +12,16 @@ func (p *PluginPipeline) AddDefaultPreBuildTargets() {
 	p.addPlugin(gitContextLoader)
 }
 
-func (p *PluginPipeline) AddDefaultPostBuildTargets() {
+func (p *PluginPipeline) AddDefaultPostBuildStages() {
 	manifestWriter := &builtin.ManifestWriter{}
 	manifestWriter.SetConfig(p.logger, "Manifest writer", p.config, nil)
 	p.addPlugin(manifestWriter)
 }
 
-func (p *PluginPipeline) AddDefaultPreDeployTargets() {
+func (p *PluginPipeline) AddDefaultPreDeployStages() {
 
 }
 
-func (p *PluginPipeline) AddDefaultPostDeployTargets() {
+func (p *PluginPipeline) AddDefaultPostDeployStages() {
 
 }

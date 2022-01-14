@@ -3,6 +3,7 @@ package builtin
 import (
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/rdrdog/bldr/pkg/lib/git"
 	"github.com/sirupsen/logrus"
 )
@@ -20,7 +21,7 @@ func (p *GitContextLoader) SetConfig(logger *logrus.Logger, targetName string, c
 	return nil
 }
 
-func (p *GitContextLoader) Execute(contextProvider *contexts.ContextProvider) error {
+func (p *GitContextLoader) Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error {
 	bc := contextProvider.BuildContext
 	p.logger.Infof("loading git context for path %s", bc.PathContext.RepoRootDirectory)
 
