@@ -8,18 +8,17 @@ import (
 )
 
 func TestDockerBuildSetConfig(t *testing.T) {
-	targetName := "name-of-target"
-
 	params := map[string]interface{}{
+		"name":    "my-cool-container",
 		"path":    "src/ui/Dockerfile",
 		"include": []string{"src/ui/**"},
 	}
 
 	p := &DockerBuild{}
 
-	p.SetConfig(nil, targetName, nil, params)
+	p.SetConfig(nil, nil, params)
 
-	assert.Equal(t, targetName, p.Name)
+	assert.Equal(t, params["name"], p.Name)
 	assert.Equal(t, params["path"], p.Path)
 	assert.Equal(t, params["include"], p.Include)
 }

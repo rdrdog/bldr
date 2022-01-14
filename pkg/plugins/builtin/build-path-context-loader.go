@@ -17,13 +17,11 @@ const PipelineConfigFileName = "pipeline-config.yaml"
 type BuildPathContextLoader struct {
 	configuration *config.Configuration
 	logger        *logrus.Logger
-	Name          string
 }
 
-func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
+func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
 	p.configuration = configuration
 	p.logger = logger
-	p.Name = targetName
 	return nil
 }
 

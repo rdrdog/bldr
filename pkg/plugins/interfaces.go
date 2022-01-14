@@ -9,5 +9,5 @@ import (
 
 type PluginDefinition interface {
 	Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error
-	SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error
+	SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error
 }
