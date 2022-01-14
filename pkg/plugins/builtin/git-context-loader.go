@@ -11,13 +11,11 @@ import (
 type GitContextLoader struct {
 	configuration *config.Configuration
 	logger        *logrus.Logger
-	Name          string
 }
 
-func (p *GitContextLoader) SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
+func (p *GitContextLoader) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
 	p.configuration = configuration
 	p.logger = logger
-	p.Name = targetName
 	return nil
 }
 

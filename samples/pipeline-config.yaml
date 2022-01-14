@@ -1,22 +1,22 @@
 build:
   stages:
-  - name: infra-example
-    plugin: builtin/DockerBuild
+  - plugin: builtin/DockerBuild
     params:
+      name: infra-example
       path: samples/examples/infra/Dockerfile
       include:
         - samples/examples/infra/**
 
-  - name: example-api
-    plugin: builtin/DockerBuild
+  - plugin: builtin/DockerBuild
     params:
+      name: example-api
       path: samples/examples/api/Dockerfile
       include:
         - samples/examples/api/**
 
-  - name: test-example
-    plugin: builtin/DockerBuild
+  - plugin: builtin/DockerBuild
     params:
+      name: test-example
       path: samples/examples/tests/Dockerfile
       include:
         - samples/examples/tests/**

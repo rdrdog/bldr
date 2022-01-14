@@ -21,10 +21,9 @@ type DockerRunTargets struct {
 	Secrets map[string]interface{}
 }
 
-func (p *DockerRun) SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
+func (p *DockerRun) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
 	p.configuration = configuration
 	p.logger = logger
-	p.Name = targetName
 	return mapstructure.Decode(pluginConfig, p)
 }
 

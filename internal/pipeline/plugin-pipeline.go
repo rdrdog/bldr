@@ -93,7 +93,7 @@ func (p *PluginPipeline) LoadPipelineStages() error {
 		yamlPath := fmt.Sprintf("$.%s.stages[%d].params", p.mode, i)
 		pluginConfig := pipelineCfg.LoadPluginConfig(yamlPath)
 
-		err = pluginInstance.SetConfig(p.logger, s.Name, p.config, pluginConfig)
+		err = pluginInstance.SetConfig(p.logger, p.config, pluginConfig)
 		if err != nil {
 			return err
 		}
