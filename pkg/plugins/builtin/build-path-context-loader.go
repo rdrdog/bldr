@@ -25,8 +25,8 @@ func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, configuration 
 	return nil
 }
 
-func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error {
-	pc := contextProvider.BuildContext.PathContext
+func (p *BuildPathContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+	pc := contextProvider.GetBuildContext().PathContext
 	p.logger.Info("loading path context")
 
 	var err error

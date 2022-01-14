@@ -1,9 +1,12 @@
-package config
+package providers
 
 import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	builtinExtensions "github.com/rdrdog/bldr/pkg/extensions/builtin"
+	builtinPlugins "github.com/rdrdog/bldr/pkg/plugins/builtin"
 
 	"github.com/sirupsen/logrus"
 )
@@ -22,6 +25,8 @@ func NewRegistry(logger *logrus.Logger) *Registry {
 		logger:  logger,
 		plugins: make(map[string]reflect.Type),
 	}
+
+	registry.registerBuiltInPlugins()
 
 	return registry
 }
@@ -44,4 +49,14 @@ func (r *Registry) CreateInstance(name string) (interface{}, error) {
 	}
 
 	return reflect.New(r.plugins[name]).Interface(), nil
+}
+
+func (r *Registry) registerBuiltInPlugins() {
+
+	r.RegisterType((*builtinPlugins.BuildPathContextLoader)(nil))
+	r.RegisterType((*builtinPlugins.DockerBuild)(nil))
+	r.RegisterType((*builtinPlugins.GitContextLoader)(nil))
+	r.RegisterType((*builtinPlugins.ManifestWriter)(nil))
+	r.RegisterType((*builtinExtensions.NullSecretLoader)(nil))
+
 }

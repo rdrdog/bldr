@@ -42,9 +42,11 @@ func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
 			BuildArtefactDirectory: ".",
 		},
 	}
-	mw.Execute(&contexts.ContextProvider{
-		BuildContext: buildContext,
-	}, nil)
+	contextProvider := &mockContextProvider{
+		buildContext: buildContext,
+	}
+
+	mw.Execute(contextProvider, nil)
 
 	fileExists, _ := afero.Exists(config.Appfs, "./manifest.yaml")
 	// Check that the file exists
@@ -60,4 +62,16 @@ func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
 	assert.Equal(t, buildContext.GitContext.FullCommitSha, result.Repo.CommitSha)
 	assert.Equal(t, buildContext.GitContext.BranchName, result.Repo.BranchName)
 	assert.Equal(t, buildContext.ArtefactManifest.Artefacts, result.Artefacts)
+}
+
+type mockContextProvider struct {
+	buildContext *contexts.BuildContext
+}
+
+func (p *mockContextProvider) GetBuildContext() *contexts.BuildContext {
+	return p.buildContext
+}
+
+func (p *mockContextProvider) GetDeployContext() *contexts.DeployContext {
+	return nil
 }

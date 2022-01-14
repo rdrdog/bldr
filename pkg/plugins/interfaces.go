@@ -8,6 +8,6 @@ import (
 )
 
 type PluginDefinition interface {
-	Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error
+	Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error
 	SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error
 }
