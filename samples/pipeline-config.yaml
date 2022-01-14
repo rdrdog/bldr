@@ -23,14 +23,19 @@ build:
 
 deploy:
 
-  secretloader:
-    plugin: builtin/AWSLoader
-    # TODO - secret loader would need to know what the convention was for getting secrets from cloud services based on the project name
+  extensions:
+    secretloader:
+      #definition: builtin/AWSLoader
+      definition: builtin/NullSecretLoader
+      params:
+        # TODO - secret loader would need to know what the convention was for getting secrets from cloud services based on the project name
 
   stages:
   - name: deploy-infra
     plugin: builtin/DockerRun
     params:
+      skipenvironments:
+        - localk8s
       targets:
         - name: infra-example
           secrets:

@@ -8,38 +8,55 @@ import (
 	"github.com/rdrdog/bldr/internal/models"
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
+	builtinExtensions "github.com/rdrdog/bldr/pkg/extensions/builtin"
 	"github.com/rdrdog/bldr/pkg/plugins"
+	builtinPlugins "github.com/rdrdog/bldr/pkg/plugins/builtin"
 	"github.com/sirupsen/logrus"
 )
 
 type PluginPipeline struct {
-	config          *config.Configuration
-	contextProvider *contexts.ContextProvider
-	logger          *logrus.Logger
-	mode            string
-	plugins         []plugins.PluginDefinition
-	registry        *plugins.Registry
+	config             *config.Configuration
+	contextProvider    *contexts.ContextProvider
+	extensionsProvider *extensions.ExtensionsProvider
+	logger             *logrus.Logger
+	mode               string
+	plugins            []plugins.PluginDefinition
+	registry           *config.Registry
 }
 
 func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
 	p.plugins = append(p.plugins, plugin)
 }
 
+// TODO - move this
+func registerBuiltInPlugins(registry *config.Registry) {
+
+	registry.RegisterType((*builtinPlugins.BuildPathContextLoader)(nil))
+	registry.RegisterType((*builtinPlugins.DockerBuild)(nil))
+	registry.RegisterType((*builtinPlugins.GitContextLoader)(nil))
+	registry.RegisterType((*builtinPlugins.ManifestWriter)(nil))
+	registry.RegisterType((*builtinExtensions.NullSecretLoader)(nil))
+
+}
+
 func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, pipelineOperationMode string) *PluginPipeline {
-	registry := plugins.NewRegistry(logger)
-	registry.RegisterBuiltIn()
+	registry := config.NewRegistry(logger)
+	registerBuiltInPlugins(registry)
 
 	pipeline := &PluginPipeline{
-		config:          baseConfig,
-		contextProvider: contexts.NewContextProvider(logger),
-		logger:          logger,
-		mode:            pipelineOperationMode,
-		registry:        registry,
+		config:             baseConfig,
+		contextProvider:    contexts.NewContextProvider(logger),
+		extensionsProvider: extensions.NewExtensionsProvider(logger, baseConfig, registry),
+		logger:             logger,
+		mode:               pipelineOperationMode,
+		registry:           registry,
 	}
+
 	return pipeline
 }
 
-func (p *PluginPipeline) AddPipelineConfigTargets() error {
+func (p *PluginPipeline) LoadPipelineStages() error {
 
 	pipelineCfg, err := models.LoadPipelineConfig(p.config.Pipeline.Path)
 	if err != nil {
@@ -51,8 +68,10 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 
 	switch p.mode {
 	case config.PipelineOperationModeBuild:
+		p.extensionsProvider.LoadExtensions(pipelineCfg.Build.Extensions)
 		stages = pipelineCfg.Build.Stages
 	case config.PipelineOperationModeDeploy:
+		p.extensionsProvider.LoadExtensions(pipelineCfg.Deploy.Extensions)
 		stages = pipelineCfg.Deploy.Stages
 	default:
 		return fmt.Errorf("unexpected operation mode: '%s'", p.mode)
@@ -64,10 +83,12 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 		// Load the PluginDefinition using the plugin registry for now
 		// Later, we could potentially support go plugins
 
-		pluginInstance, err := p.registry.CreateInstance(s.Plugin)
+		pluginInterface, err := p.registry.CreateInstance(s.Plugin)
 		if err != nil {
 			return err
 		}
+
+		pluginInstance := pluginInterface.(plugins.PluginDefinition)
 
 		yamlPath := fmt.Sprintf("$.%s.stages[%d].params", p.mode, i)
 		pluginConfig := pipelineCfg.LoadPluginConfig(yamlPath)
@@ -91,7 +112,7 @@ func (p *PluginPipeline) Run() error {
 		p.logger.Infof("🚀 running plugin %s", pluginName)
 		start := time.Now()
 
-		err := plugin.Execute(p.contextProvider)
+		err := plugin.Execute(p.contextProvider, p.extensionsProvider)
 
 		p.logger.Infof("⏳ plugin %s took %v seconds", pluginName, time.Since(start).Seconds())
 

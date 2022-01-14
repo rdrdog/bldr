@@ -5,6 +5,7 @@ import (
 
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
@@ -25,7 +26,7 @@ func (p *ManifestWriter) SetConfig(logger *logrus.Logger, targetName string, con
 	return nil
 }
 
-func (p *ManifestWriter) Execute(contextProvider *contexts.ContextProvider) error {
+func (p *ManifestWriter) Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error {
 
 	bc := contextProvider.BuildContext
 	manifestInstance := &manifest{

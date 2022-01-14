@@ -5,15 +5,18 @@ import (
 
 	"github.com/goccy/go-yaml"
 	"github.com/rdrdog/bldr/pkg/config"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/spf13/afero"
 )
 
 type PipelineConfig struct {
 	Build struct {
-		Stages []Stage
+		Extensions map[string]extensions.ExtensionDefinition
+		Stages     []Stage
 	}
 	Deploy struct {
-		Stages []Stage
+		Extensions map[string]extensions.ExtensionDefinition
+		Stages     []Stage
 	}
 	source []byte
 }

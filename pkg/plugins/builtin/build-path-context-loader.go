@@ -6,6 +6,7 @@ import (
 
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/rdrdog/bldr/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
@@ -26,7 +27,7 @@ func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, targetName str
 	return nil
 }
 
-func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvider) error {
+func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error {
 	pc := contextProvider.BuildContext.PathContext
 	p.logger.Info("loading path context")
 

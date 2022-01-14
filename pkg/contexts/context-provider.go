@@ -1,6 +1,8 @@
 package contexts
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/sirupsen/logrus"
+)
 
 type ContextProvider struct {
 	BuildContext  *BuildContext

@@ -8,6 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/rdrdog/bldr/pkg/lib/docker"
 	"github.com/sirupsen/logrus"
 )
@@ -30,7 +31,7 @@ func (p *DockerBuild) SetConfig(logger *logrus.Logger, targetName string, config
 	return mapstructure.Decode(pluginConfig, p)
 }
 
-func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
+func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider, extensionsProvider *extensions.ExtensionsProvider) error {
 	bc := contextProvider.BuildContext
 
 	imageTag := bc.GitContext.ShortCommitSha

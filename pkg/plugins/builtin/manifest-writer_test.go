@@ -46,7 +46,7 @@ func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
 	}
 	mw.Execute(&contexts.ContextProvider{
 		BuildContext: buildContext,
-	})
+	}, nil)
 
 	fileExists, _ := afero.Exists(config.Appfs, "./manifest.yaml")
 	// Check that the file exists
