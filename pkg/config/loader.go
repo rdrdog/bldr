@@ -18,14 +18,14 @@ const buildEnvironmentNameCI = "ci"
 const bldrConfigFileName = "bldr.yaml"
 const bldrConfigDefaults = `
 default:
-  logging:
-    level: INFO
-  paths:
-    pipelineconfigfile: pipeline-config.yaml
   docker:
     useBuildKit: true
   git:
     mainBranchName: main
+  logging:
+    level: INFO
+  paths:
+    pipelineconfigfile: pipeline-config.yaml
 
 local:
   docker:
@@ -42,14 +42,27 @@ ci:
     useRemoteContainerRegistryCache: true
 `
 
-func Load(logger *logrus.Logger) (*Configuration, error) {
-	// TODO
-	// 1 - create configuration defaults objects
-	// 2 - load env vars over the top of the defaults
-	// 3 - load bldrConfigFile over the top
-	//    3a - use the defaults to create the bldrConfigFile if it doesn't exist
+func getConfigDefaults() *Configuration {
+	configDefaults := &Configuration{
+		Docker: DockerConfig{
+			UseBuildKit: true,
+		},
+		Git: GitConfig{
+			MainBranchName: "main",
+		},
+		Logging: LoggingConfig{
+			Level: "INFO",
+		},
+		Paths: PathsConfig{
+			PipelineConfigFile: "pipeline-config.yaml",
+		},
+	}
 
-	newConfig := &Configuration{}
+	return configDefaults
+}
+
+func Load(logger *logrus.Logger) (*Configuration, error) {
+	newConfig := getConfigDefaults()
 
 	// First, populate any environment var overrides
 	for _, configSection := range []interface{}{
