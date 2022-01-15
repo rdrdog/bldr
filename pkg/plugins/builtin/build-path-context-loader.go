@@ -11,9 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const BuildArtefactDirectoryName = "build-artefacts"
-const PipelineConfigFileName = "pipeline-config.yaml"
-
 type BuildPathContextLoader struct {
 	configuration *config.Configuration
 	logger        *logrus.Logger
@@ -26,30 +23,20 @@ func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, configuration 
 }
 
 func (p *BuildPathContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
-	pc := contextProvider.GetBuildContext().PathContext
-	p.logger.Info("loading path context")
+	p.logger.Info("setting up build paths")
 
-	var err error
-	pc.RepoRootDirectory, err = os.Getwd()
+	buildArtefactDir := p.configuration.Paths.BuildArtefactDirectory
+	os.RemoveAll(buildArtefactDir)
+	err := os.Mkdir(buildArtefactDir, 0755)
 	if err != nil {
-		p.logger.Fatal("could not load working directory in build path context loader")
-		return err
-	}
-
-	p.logger.Debugf("repo root directory determined to be %s", pc.RepoRootDirectory)
-
-	pc.BuildArtefactDirectory = path.Join(pc.RepoRootDirectory, BuildArtefactDirectoryName)
-
-	os.RemoveAll(pc.BuildArtefactDirectory)
-	err = os.Mkdir(pc.BuildArtefactDirectory, 0755)
-	if err != nil {
-		p.logger.Fatalf("error creating artefact directory at %s: %v", pc.BuildArtefactDirectory, err)
+		p.logger.Fatalf("error creating artefact directory at %s: %v", buildArtefactDir, err)
 		return err
 	}
 
 	// Copy the pipeline-config.yaml to the artefact directory
-	pipelineConfigDst := path.Join(pc.BuildArtefactDirectory, PipelineConfigFileName)
-	utils.CopyFile(p.configuration.Pipeline.Path, pipelineConfigDst)
+	_, pipelineConfigFileName := path.Split(p.configuration.Paths.PipelineConfigFile)
+	pipelineConfigDst := path.Join(buildArtefactDir, pipelineConfigFileName)
+	utils.CopyFile(p.configuration.Paths.PipelineConfigFile, pipelineConfigDst)
 
 	return nil
 }

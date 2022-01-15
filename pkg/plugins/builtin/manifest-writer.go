@@ -46,7 +46,7 @@ func (p *ManifestWriter) Execute(contextProvider contexts.ContextProvider, exten
 		return err
 	}
 
-	manifestFilePath := path.Join(bc.PathContext.BuildArtefactDirectory, ManifestFileName)
+	manifestFilePath := path.Join(p.config.Paths.BuildArtefactDirectory, ManifestFileName)
 	err = afero.WriteFile(config.Appfs, manifestFilePath, manifestData, 0777)
 	if err != nil {
 		p.logger.Errorf("error writing manifest file to %s: %v", manifestFilePath, err)

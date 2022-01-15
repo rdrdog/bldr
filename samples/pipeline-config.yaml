@@ -26,7 +26,7 @@ deploy:
   extensions:
     secretloader:
       #definition: builtin/AWSLoader
-      definition: builtin/NullSecretLoader
+      definition: builtin/LocalSecretLoader
       params:
         # TODO - secret loader would need to know what the convention was for getting secrets from cloud services based on the project name
 

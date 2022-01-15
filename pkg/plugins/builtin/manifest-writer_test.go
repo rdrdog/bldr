@@ -24,6 +24,11 @@ func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
 	mw := &ManifestWriter{}
 	logger, _ := test.NewNullLogger()
 	mw.logger = logger
+	mw.config = &config.Configuration{}
+	mw.config.Paths = config.PathsConfig{
+		RepoRootDirectory:      ".",
+		BuildArtefactDirectory: ".",
+	}
 
 	config.Appfs = afero.NewMemMapFs()
 
@@ -36,10 +41,6 @@ func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
 			FullCommitSha:  "8f825b7454e61e5c61fcf165e8299151b46d67f8",
 			ShortCommitSha: "8f825b7",
 			BranchName:     "main",
-		},
-		PathContext: &contexts.PathContext{
-			RepoRootDirectory:      ".",
-			BuildArtefactDirectory: ".",
 		},
 	}
 	contextProvider := &mockContextProvider{

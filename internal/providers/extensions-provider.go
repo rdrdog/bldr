@@ -27,7 +27,7 @@ func NewExtensionsProvider(logger *logrus.Logger, configuration *config.Configur
 		configuration: configuration,
 		logger:        logger,
 		registry:      registry,
-		secretLoader:  &builtin.NullSecretLoader{},
+		secretLoader:  &builtin.LocalSecretLoader{},
 	}
 }
 

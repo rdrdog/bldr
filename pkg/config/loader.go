@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path"
 
 	"github.com/caarlos0/env"
 	"github.com/mitchellh/mapstructure"
@@ -10,6 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const buildArtefactDirectoryName = "build-artefacts"
 const buildEnvironmentNameLocal = "local"
 const buildEnvironmentNameCI = "ci"
 const bldrConfigFileName = "bldr.yaml"
@@ -17,8 +20,8 @@ const bldrConfigDefaults = `
 default:
   logging:
     level: INFO
-  pipeline:
-    path: pipeline-config.yaml
+  paths:
+    pipelineconfigfile: pipeline-config.yaml
   docker:
     useBuildKit: true
   git:
@@ -40,6 +43,12 @@ ci:
 `
 
 func Load(logger *logrus.Logger) (*Configuration, error) {
+	// TODO
+	// 1 - create configuration defaults objects
+	// 2 - load env vars over the top of the defaults
+	// 3 - load bldrConfigFile over the top
+	//    3a - use the defaults to create the bldrConfigFile if it doesn't exist
+
 	newConfig := &Configuration{}
 
 	// First, populate any environment var overrides
@@ -48,7 +57,7 @@ func Load(logger *logrus.Logger) (*Configuration, error) {
 		&newConfig.Docker,
 		&newConfig.Git,
 		&newConfig.Logging,
-		&newConfig.Pipeline,
+		&newConfig.Paths,
 	} {
 		if err := env.Parse(configSection); err != nil {
 			return nil, fmt.Errorf("unable to load the config: %v", err)
@@ -72,6 +81,15 @@ func Load(logger *logrus.Logger) (*Configuration, error) {
 	}
 
 	newConfig.Logging.SetFormatter(logger)
+
+	newConfig.Paths.RepoRootDirectory, err = os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("unable to load current working directory: %v", err)
+	}
+
+	logger.Debugf("repo root directory determined to be %s", newConfig.Paths.RepoRootDirectory)
+	// Set the build artefact directory to be rooted at the repo root directory
+	newConfig.Paths.BuildArtefactDirectory = path.Join(newConfig.Paths.RepoRootDirectory, buildArtefactDirectoryName)
 
 	return newConfig, nil
 }
