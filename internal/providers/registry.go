@@ -57,6 +57,6 @@ func (r *Registry) registerBuiltInPlugins() {
 	r.RegisterType((*builtinPlugins.DockerBuild)(nil))
 	r.RegisterType((*builtinPlugins.GitContextLoader)(nil))
 	r.RegisterType((*builtinPlugins.ManifestWriter)(nil))
-	r.RegisterType((*builtinExtensions.NullSecretLoader)(nil))
+	r.RegisterType((*builtinExtensions.LocalSecretLoader)(nil))
 
 }

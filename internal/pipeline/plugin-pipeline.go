@@ -43,7 +43,7 @@ func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, 
 
 func (p *PluginPipeline) LoadPipelineStages() error {
 
-	pipelineCfg, err := models.LoadPipelineConfig(p.config.Pipeline.Path)
+	pipelineCfg, err := models.LoadPipelineConfig(p.config.Paths.PipelineConfigFile)
 	if err != nil {
 		// log/blow up
 		return err

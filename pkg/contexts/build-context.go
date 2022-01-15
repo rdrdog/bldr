@@ -4,7 +4,6 @@ type BuildContext struct {
 	BuildNumber      string
 	ArtefactManifest *ArtefactManifest
 	GitContext       *GitContext
-	PathContext      *PathContext
 }
 
 func CreateBuildContext() *BuildContext {
@@ -12,8 +11,7 @@ func CreateBuildContext() *BuildContext {
 		ArtefactManifest: &ArtefactManifest{
 			Artefacts: make(map[string]string),
 		},
-		GitContext:  &GitContext{},
-		PathContext: &PathContext{},
+		GitContext: &GitContext{},
 	}
 }
 
@@ -28,11 +26,6 @@ type GitContext struct {
 	MainBranchForkPoint      string
 	MainBranchForkPointShort string
 	ChangesSinceMainBranch   []string
-}
-
-type PathContext struct {
-	RepoRootDirectory      string
-	BuildArtefactDirectory string
 }
 
 func (am *ArtefactManifest) AddArtefact(targetName string, artefactPath string) {

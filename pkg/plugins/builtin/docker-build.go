@@ -59,7 +59,7 @@ func (p *DockerBuild) Execute(contextProvider contexts.ContextProvider, extensio
 		fmt.Sprintf("%s=\"%s\"", buildArgContainerCommitSha, bc.GitContext.FullCommitSha),
 	}
 
-	docker.Build(p.Path, bc.PathContext.RepoRootDirectory, imageName, imageTag, buildArgs)
+	docker.Build(p.Path, p.configuration.Paths.RepoRootDirectory, imageName, imageTag, buildArgs)
 
 	if p.configuration.Docker.PushContainers {
 		docker.Push(imageName, imageTag)
