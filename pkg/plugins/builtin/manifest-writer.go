@@ -5,6 +5,7 @@ import (
 
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
@@ -15,19 +16,17 @@ const ManifestFileName = "manifest.yaml"
 type ManifestWriter struct {
 	config *config.Configuration
 	logger *logrus.Logger
-	Name   string
 }
 
-func (p *ManifestWriter) SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
+func (p *ManifestWriter) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
 	p.config = configuration
 	p.logger = logger
-	p.Name = targetName
 	return nil
 }
 
-func (p *ManifestWriter) Execute(contextProvider *contexts.ContextProvider) error {
+func (p *ManifestWriter) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
 
-	bc := contextProvider.BuildContext
+	bc := contextProvider.GetBuildContext()
 	manifestInstance := &manifest{
 		BuildNumber: bc.BuildNumber,
 		Artefacts:   bc.ArtefactManifest.Artefacts,

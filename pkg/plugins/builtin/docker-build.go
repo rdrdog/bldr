@@ -8,6 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/rdrdog/bldr/pkg/lib/docker"
 	"github.com/sirupsen/logrus"
 )
@@ -23,15 +24,14 @@ type DockerBuild struct {
 	Include       []string
 }
 
-func (p *DockerBuild) SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
+func (p *DockerBuild) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
 	p.configuration = configuration
 	p.logger = logger
-	p.Name = targetName
 	return mapstructure.Decode(pluginConfig, p)
 }
 
-func (p *DockerBuild) Execute(contextProvider *contexts.ContextProvider) error {
-	bc := contextProvider.BuildContext
+func (p *DockerBuild) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+	bc := contextProvider.GetBuildContext()
 
 	imageTag := bc.GitContext.ShortCommitSha
 	if p.configuration.Docker.IncludeTimeInImageTag {

@@ -1,35 +1,74 @@
-projectName: my-example
-
-targets:
-  - name: infra-example
-    build:
-      plugin: builtin/DockerBuild
+build:
+  stages:
+  - plugin: builtin/DockerBuild
+    params:
+      name: infra-example
       path: samples/examples/infra/Dockerfile
       include:
         - samples/examples/infra/**
-    deploy:
-      plugin: builtin/DockerRun
-      secrets:
-        - key: GH_ADMIN_TOKEN
-          envValue: GITHUB_TOKEN
-          loadFromFile: true
 
-  - name: example-api
-    build:
-      plugin: builtin/DockerBuild
+  - plugin: builtin/DockerBuild
+    params:
+      name: example-api
       path: samples/examples/api/Dockerfile
       include:
         - samples/examples/api/**
-    deploy:
-      plugin: builtin/K8sDeploy
-      runtimeConfiguration: samples/examples/ui/k8s.yaml
 
-  - name: test-example
-    build:
-      plugin: builtin/DockerBuild
+  - plugin: builtin/DockerBuild
+    params:
+      name: test-example
       path: samples/examples/tests/Dockerfile
       include:
         - samples/examples/tests/**
-    deploy:
-      plugin: builtin/DockerRun
-      runFromK8s: true
+
+deploy:
+
+  extensions:
+    secretloader:
+      #definition: builtin/AWSLoader
+      definition: builtin/NullSecretLoader
+      params:
+        # TODO - secret loader would need to know what the convention was for getting secrets from cloud services based on the project name
+
+  stages:
+  - name: deploy-infra
+    plugin: builtin/DockerRun
+    params:
+      skipenvironments:
+        - localk8s
+      targets:
+        - name: infra-example
+          secrets:
+            - key: GH_ADMIN_TOKEN
+              envValue: GITHUB_TOKEN
+
+  - name: k8s-deploy
+    plugin: builtin/HelmDeploy
+    # git checkout github.com/company/cloud-platform@v1
+    # cd shared/helm
+    # helm install --upgrade -f /build-arfefacts/manifest.yaml -f /build-arfefacts/secrets.yaml -f samples/examples/api/k8s.yaml
+    #    --namespace "my-cool-thing-feature/abc"
+    #    --release "my-cool-thing" .
+
+    params:
+      chart: github.com/company/cloud-platform/shared/helm@v1
+      release: 'my-cool-thing'
+      namespaceprefix: 'my-cool-thing'
+      featurebranchnamespacing: true
+      targets:
+        - name: example-api
+          helmvalues: samples/examples/api/k8s.yaml # optional
+          secrets:
+            - key: SQL_CONNECTION_STRING
+              envValue: DB_CONNECTION
+
+        - name: example-ui
+
+  - name: run-tests
+    plugin: builtin/K8sRun
+    params:
+      targets:
+        - name: test-example
+          secrets:
+            - key: TEST_USER_PASSWORD
+              envValue: TEST_USER_PASSWORD

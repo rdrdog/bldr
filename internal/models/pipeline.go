@@ -4,29 +4,27 @@ import (
 	"bytes"
 
 	"github.com/goccy/go-yaml"
+	"github.com/rdrdog/bldr/internal/providers"
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/spf13/afero"
 )
 
 type PipelineConfig struct {
-	Targets []Target
-	source  []byte
+	Build struct {
+		Extensions map[string]providers.ExtensionDefinition
+		Stages     []Stage
+	}
+	Deploy struct {
+		Extensions map[string]providers.ExtensionDefinition
+		Stages     []Stage
+	}
+	source []byte
 }
 
-type Target struct {
+type Stage struct {
 	Name   string
-	Build  BuildTarget
-	Deploy DeployTarget
-}
-
-type BuildTarget struct {
-	Plugin  string
-	Path    string
-	Include []string
-}
-
-type DeployTarget struct {
 	Plugin string
+	Params map[string]interface{}
 }
 
 func LoadPipelineConfig(configFilePath string) (*PipelineConfig, error) {

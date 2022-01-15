@@ -6,19 +6,20 @@ import (
 	"time"
 
 	"github.com/rdrdog/bldr/internal/models"
+	"github.com/rdrdog/bldr/internal/providers"
 	"github.com/rdrdog/bldr/pkg/config"
-	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/rdrdog/bldr/pkg/plugins"
 	"github.com/sirupsen/logrus"
 )
 
 type PluginPipeline struct {
-	config          *config.Configuration
-	contextProvider *contexts.ContextProvider
-	logger          *logrus.Logger
-	mode            string
-	plugins         []plugins.PluginDefinition
-	registry        *plugins.Registry
+	config             *config.Configuration
+	contextProvider    *providers.DefaultContextProvider
+	extensionsProvider *providers.DefaultExtensionsProvider
+	logger             *logrus.Logger
+	mode               string
+	plugins            []plugins.PluginDefinition
+	registry           *providers.Registry
 }
 
 func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
@@ -26,20 +27,21 @@ func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
 }
 
 func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, pipelineOperationMode string) *PluginPipeline {
-	registry := plugins.NewRegistry(logger)
-	registry.RegisterBuiltIn()
+	registry := providers.NewRegistry(logger)
 
 	pipeline := &PluginPipeline{
-		config:          baseConfig,
-		contextProvider: contexts.NewContextProvider(logger),
-		logger:          logger,
-		mode:            pipelineOperationMode,
-		registry:        registry,
+		config:             baseConfig,
+		contextProvider:    providers.NewContextProvider(logger),
+		extensionsProvider: providers.NewExtensionsProvider(logger, baseConfig, registry),
+		logger:             logger,
+		mode:               pipelineOperationMode,
+		registry:           registry,
 	}
+
 	return pipeline
 }
 
-func (p *PluginPipeline) AddPipelineConfigTargets() error {
+func (p *PluginPipeline) LoadPipelineStages() error {
 
 	pipelineCfg, err := models.LoadPipelineConfig(p.config.Pipeline.Path)
 	if err != nil {
@@ -47,31 +49,36 @@ func (p *PluginPipeline) AddPipelineConfigTargets() error {
 		return err
 	}
 
-	for i, t := range pipelineCfg.Targets {
-		var pluginName string
+	var stages []models.Stage
 
-		switch p.mode {
-		case config.PipelineOperationModeBuild:
-			pluginName = t.Build.Plugin
-		case config.PipelineOperationModeDeploy:
-			pluginName = t.Deploy.Plugin
-		default:
-			return fmt.Errorf("unexpected operation mode: '%s'", p.mode)
-		}
+	switch p.mode {
+	case config.PipelineOperationModeBuild:
+		p.extensionsProvider.LoadExtensions(pipelineCfg.Build.Extensions)
+		stages = pipelineCfg.Build.Stages
+	case config.PipelineOperationModeDeploy:
+		p.extensionsProvider.LoadExtensions(pipelineCfg.Deploy.Extensions)
+		stages = pipelineCfg.Deploy.Stages
+	default:
+		return fmt.Errorf("unexpected operation mode: '%s'", p.mode)
+	}
 
-		p.logger.Infof("initialising target: %v using %v\n", t.Name, pluginName)
+	for i, s := range stages {
+
+		p.logger.Infof("initialising target: %v using %v\n", s.Name, s.Plugin)
 		// Load the PluginDefinition using the plugin registry for now
 		// Later, we could potentially support go plugins
 
-		pluginInstance, err := p.registry.CreateInstance(pluginName)
+		pluginInterface, err := p.registry.CreateInstance(s.Plugin)
 		if err != nil {
 			return err
 		}
 
-		yamlPath := fmt.Sprintf("$.targets[%d].%s", i, p.mode)
+		pluginInstance := pluginInterface.(plugins.PluginDefinition)
+
+		yamlPath := fmt.Sprintf("$.%s.stages[%d].params", p.mode, i)
 		pluginConfig := pipelineCfg.LoadPluginConfig(yamlPath)
 
-		err = pluginInstance.SetConfig(p.logger, t.Name, p.config, pluginConfig)
+		err = pluginInstance.SetConfig(p.logger, p.config, pluginConfig)
 		if err != nil {
 			return err
 		}
@@ -90,7 +97,7 @@ func (p *PluginPipeline) Run() error {
 		p.logger.Infof("🚀 running plugin %s", pluginName)
 		start := time.Now()
 
-		err := plugin.Execute(p.contextProvider)
+		err := plugin.Execute(p.contextProvider, p.extensionsProvider)
 
 		p.logger.Infof("⏳ plugin %s took %v seconds", pluginName, time.Since(start).Seconds())
 

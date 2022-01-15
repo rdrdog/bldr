@@ -16,14 +16,14 @@ func main() {
 
 	pp := pipeline.NewPluginPipeline(logger, conf, config.PipelineOperationModeBuild)
 
-	pp.AddDefaultPreBuildTargets()
+	pp.AddDefaultPreBuildStages()
 
-	err = pp.AddPipelineConfigTargets()
+	err = pp.LoadPipelineStages()
 	if err != nil {
 		logger.Fatalf("error loading plugins: %v", err)
 	}
 
-	pp.AddDefaultPostBuildTargets()
+	pp.AddDefaultPostBuildStages()
 
 	pp.Run()
 }

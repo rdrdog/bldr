@@ -6,6 +6,7 @@ import (
 
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/rdrdog/bldr/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
@@ -16,18 +17,16 @@ const PipelineConfigFileName = "pipeline-config.yaml"
 type BuildPathContextLoader struct {
 	configuration *config.Configuration
 	logger        *logrus.Logger
-	Name          string
 }
 
-func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
+func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
 	p.configuration = configuration
 	p.logger = logger
-	p.Name = targetName
 	return nil
 }
 
-func (p *BuildPathContextLoader) Execute(contextProvider *contexts.ContextProvider) error {
-	pc := contextProvider.BuildContext.PathContext
+func (p *BuildPathContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+	pc := contextProvider.GetBuildContext().PathContext
 	p.logger.Info("loading path context")
 
 	var err error

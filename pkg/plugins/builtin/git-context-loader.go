@@ -3,6 +3,7 @@ package builtin
 import (
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/rdrdog/bldr/pkg/lib/git"
 	"github.com/sirupsen/logrus"
 )
@@ -10,18 +11,16 @@ import (
 type GitContextLoader struct {
 	configuration *config.Configuration
 	logger        *logrus.Logger
-	Name          string
 }
 
-func (p *GitContextLoader) SetConfig(logger *logrus.Logger, targetName string, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
+func (p *GitContextLoader) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
 	p.configuration = configuration
 	p.logger = logger
-	p.Name = targetName
 	return nil
 }
 
-func (p *GitContextLoader) Execute(contextProvider *contexts.ContextProvider) error {
-	bc := contextProvider.BuildContext
+func (p *GitContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+	bc := contextProvider.GetBuildContext()
 	p.logger.Infof("loading git context for path %s", bc.PathContext.RepoRootDirectory)
 
 	git := git.New(p.logger, p.configuration.Git.MainBranchName, bc.PathContext.RepoRootDirectory)
