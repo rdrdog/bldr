@@ -10,5 +10,10 @@ type ExtensionsProvider interface {
 }
 type SecretLoader interface {
 	SetConfig(logger *logrus.Logger, configuration *config.Configuration, extensionConfig map[string]interface{}) error
-	LoadSecrets(map[string]interface{}) map[string]string
+	LoadSecrets(targetName string, secretParams []interface{}) ([]*SecretKeyValuePair, error)
+}
+
+type SecretKeyValuePair struct {
+	Key   string
+	Value string
 }

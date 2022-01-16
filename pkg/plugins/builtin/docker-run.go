@@ -18,7 +18,7 @@ type DockerRun struct {
 
 type DockerRunTargets struct {
 	Name    string
-	Secrets map[string]interface{}
+	Secrets []interface{}
 }
 
 func (p *DockerRun) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
@@ -38,6 +38,15 @@ func (p *DockerRun) Execute(contextProvider contexts.ContextProvider, extensions
 		- Load secrets using: extensionsProvider.SecretLoader.LoadSecrets()
 		- Run docker run...
 	*/
+
+	for _, t := range p.Targets {
+		secrets, err := extensionsProvider.GetSecretLoader().LoadSecrets(t.Name, t.Secrets)
+		if err != nil {
+			p.logger.Errorf("error loading secrets for target %s", t.Name)
+			return err
+		}
+		p.logger.Debugf("loaded secrets for target %s", secrets)
+	}
 
 	return nil
 }
