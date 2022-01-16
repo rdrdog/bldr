@@ -5,6 +5,7 @@ import (
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/rdrdog/bldr/pkg/extensions"
+	"github.com/rdrdog/bldr/pkg/lib"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,7 +27,7 @@ func (p *HelmDeploy) SetConfig(logger *logrus.Logger, configuration *config.Conf
 	return mapstructure.Decode(pluginConfig, p)
 }
 
-func (p *HelmDeploy) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+func (p *HelmDeploy) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider, libProvider lib.LibProvider) error {
 
 	return nil
 }

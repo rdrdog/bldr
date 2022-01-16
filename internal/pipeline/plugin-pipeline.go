@@ -16,6 +16,7 @@ type PluginPipeline struct {
 	config             *config.Configuration
 	contextProvider    *providers.DefaultContextProvider
 	extensionsProvider *providers.DefaultExtensionsProvider
+	libProvider        *providers.DefaultLibProvider
 	logger             *logrus.Logger
 	mode               string
 	plugins            []plugins.PluginDefinition
@@ -26,13 +27,14 @@ func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
 	p.plugins = append(p.plugins, plugin)
 }
 
-func NewPluginPipeline(logger *logrus.Logger, baseConfig *config.Configuration, pipelineOperationMode string) *PluginPipeline {
+func NewPluginPipeline(logger *logrus.Logger, cfg *config.Configuration, pipelineOperationMode string) *PluginPipeline {
 	registry := providers.NewRegistry(logger)
 
 	pipeline := &PluginPipeline{
-		config:             baseConfig,
+		config:             cfg,
 		contextProvider:    providers.NewContextProvider(logger),
-		extensionsProvider: providers.NewExtensionsProvider(logger, baseConfig, registry),
+		extensionsProvider: providers.NewExtensionsProvider(logger, cfg, registry),
+		libProvider:        providers.NewDefaultLibProvider(logger, cfg),
 		logger:             logger,
 		mode:               pipelineOperationMode,
 		registry:           registry,
@@ -97,7 +99,7 @@ func (p *PluginPipeline) Run() error {
 		p.logger.Infof("🚀 running plugin %s", pluginName)
 		start := time.Now()
 
-		err := plugin.Execute(p.contextProvider, p.extensionsProvider)
+		err := plugin.Execute(p.contextProvider, p.extensionsProvider, p.libProvider)
 
 		p.logger.Infof("⏳ plugin %s took %v seconds", pluginName, time.Since(start).Seconds())
 

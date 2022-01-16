@@ -7,6 +7,7 @@ import (
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/rdrdog/bldr/pkg/extensions"
+	"github.com/rdrdog/bldr/pkg/lib"
 	"github.com/rdrdog/bldr/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
@@ -22,7 +23,7 @@ func (p *BuildPathContextLoader) SetConfig(logger *logrus.Logger, configuration 
 	return nil
 }
 
-func (p *BuildPathContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+func (p *BuildPathContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider, libProvider lib.LibProvider) error {
 	p.logger.Info("setting up build paths")
 
 	buildArtefactDir := p.configuration.Paths.BuildArtefactDirectory
