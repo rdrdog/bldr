@@ -25,7 +25,8 @@ default:
   logging:
     level: INFO
   paths:
-    pipelineconfigfile: pipeline-config.yaml
+    deploymentManifestFile: build-artefacts/manifest.yaml
+    pipelineConfigFile: samples/pipeline-config.yaml
 
 local:
   docker:
@@ -54,7 +55,8 @@ func getConfigDefaults() *Configuration {
 			Level: "INFO",
 		},
 		Paths: PathsConfig{
-			PipelineConfigFile: "pipeline-config.yaml",
+			DeploymentManifestFile: "build-artefacts/manifest.yaml",
+			PipelineConfigFile:     "pipeline-config.yaml",
 		},
 	}
 

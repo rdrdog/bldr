@@ -142,3 +142,25 @@ func (d *Docker) IsImageAvailable(imageName string, imageTag string, useRemoteCo
 		return false
 	}
 }
+
+func (d *Docker) RunImage(imageNameAndTag string, envVars map[string]string, additionalArgs map[string]string) {
+	envVarString := mapToKeyEqualsValue(envVars, "-e ")
+	additionalArgsString := mapToKeyEqualsValue(additionalArgs, "")
+
+	args := fmt.Sprintf("run --rm %s %s %s", envVarString, additionalArgsString, imageNameAndTag)
+	_, _, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
+
+	if err == nil {
+		d.logger.Infof("🐳 docker run successful: %s", imageNameAndTag)
+	} else {
+		d.logger.Fatalf("docker run failed: %v", err)
+	}
+}
+
+func mapToKeyEqualsValue(m map[string]string, prefix string) string {
+	result := ""
+	for key, val := range m {
+		result += fmt.Sprintf("%s%s=\"%s\" ", prefix, key, val)
+	}
+	return result
+}

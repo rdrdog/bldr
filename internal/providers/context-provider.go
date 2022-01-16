@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/sirupsen/logrus"
 )
@@ -11,10 +12,10 @@ type DefaultContextProvider struct {
 	logger        *logrus.Logger
 }
 
-func NewContextProvider(logger *logrus.Logger) *DefaultContextProvider {
+func NewContextProvider(logger *logrus.Logger, config *config.Configuration) *DefaultContextProvider {
 	return &DefaultContextProvider{
 		buildContext:  contexts.CreateBuildContext(),
-		deployContext: &contexts.DeployContext{},
+		deployContext: contexts.CreateDeployContext(logger, config),
 		logger:        logger,
 	}
 }

@@ -81,7 +81,7 @@ func (e *LocalSecretLoader) LoadSecrets(targetName string, secretParams []interf
 		}
 
 		secretFile := path.Join(secretFolder, secret.Key)
-		e.logger.Infof("loading secret from %s", secretFile)
+		e.logger.Debugf("loading secret from %s", secretFile)
 		secretFileExists, err := afero.Exists(config.Appfs, secretFile)
 		if err != nil {
 			e.logger.Errorf("could not determine if secret file exists at %s: %v", secretFile, err)
@@ -101,6 +101,8 @@ func (e *LocalSecretLoader) LoadSecrets(targetName string, secretParams []interf
 			e.logger.Errorf("could not read secret file contents from %s: %v", secretFile, err)
 			return nil, err
 		}
+
+		// TODO - add `string(data)` to the logger's obfuscated values so it's not logged out
 
 		result[i] = &extensions.SecretKeyValuePair{
 			Key:   secret.EnvValue,
