@@ -37,7 +37,9 @@ func (p *DockerRun) Execute(contextProvider contexts.ContextProvider, extensions
 		return nil
 	}
 
-	p.logger.Debugf("%s is not listed in skip environments %v - running targets", dc.EnvironmentName, p.SkipEnvironments)
+	p.logger.Debugf("environment '%s' is not listed in skip environments %v - running targets", dc.EnvironmentName, p.SkipEnvironments)
+
+	docker := libProvider.GetDockerLib()
 
 	for _, t := range p.Targets {
 		secrets, err := extensionsProvider.GetSecretLoader().LoadSecrets(t.Name, t.Secrets)
@@ -47,7 +49,18 @@ func (p *DockerRun) Execute(contextProvider contexts.ContextProvider, extensions
 		}
 		p.logger.Debugf("loaded %d secrets for target %s", len(secrets), t.Name)
 
+		imageNameAndTag := dc.GetArtefactByName(t.Name)
+		docker.RunImage(imageNameAndTag, secretsToMap(secrets), nil)
 	}
 
 	return nil
+}
+
+func secretsToMap(s []*extensions.SecretKeyValuePair) map[string]string {
+	result := make(map[string]string, len(s))
+	for _, val := range s {
+		result[val.Key] = val.Value
+	}
+
+	return result
 }

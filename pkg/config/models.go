@@ -26,6 +26,7 @@ type LoggingConfig struct {
 
 type PathsConfig struct {
 	BuildArtefactDirectory string // not configurable, set in config/loader.go
+	DeploymentManifestFile string
 	PipelineConfigFile     string
 	RepoRootDirectory      string // not configurable, set in config/loader.go
 }
