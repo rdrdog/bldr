@@ -46,7 +46,7 @@ deploy:
     plugin: builtin/HelmDeploy
     # git checkout github.com/company/cloud-platform@v1
     # cd shared/helm
-    # helm install --upgrade -f /build-arfefacts/manifest.yaml -f /build-arfefacts/secrets.yaml -f samples/examples/api/k8s.yaml
+    # helm install --upgrade -f /build-artefacts/manifest.yaml -f /build-artefacts/secrets.yaml -f samples/examples/api/k8s.yaml
     #    --namespace "my-cool-thing-feature/abc"
     #    --release "my-cool-thing" .
 
