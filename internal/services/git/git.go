@@ -5,7 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rdrdog/bldr/pkg/lib/process"
+	"github.com/rdrdog/bldr/internal/services/process"
+	"github.com/rdrdog/bldr/pkg/lib"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,13 +14,9 @@ const EnvVarGitForkPoint = "GIT_MAIN_BRANCH_FORK_COMMIT"
 const EnvVarGitBranchName = "GIT_BRANCH_NAME"
 
 type Git struct {
-	logger                 *logrus.Logger
-	repoRootDirectory      string
-	mainBranchName         string
-	CommitSha              string
-	BranchName             string
-	MainBranchForkPoint    string
-	ChangesSinceMainBranch []string
+	logger            *logrus.Logger
+	repoRootDirectory string
+	mainBranchName    string
 }
 
 func New(logger *logrus.Logger, mainBranchName string, repoRootDirectory string) *Git {
@@ -93,37 +90,38 @@ func (g *Git) getBranchName() (string, error) {
 	return branchName, err
 }
 
-func (g *Git) LoadRepoInformation() *Git {
+func (g *Git) LoadRepoInformation() *lib.GitState {
+	result := &lib.GitState{}
 	var err error
-	g.CommitSha, err = g.getRepoCommitSha()
+	result.CommitSha, err = g.getRepoCommitSha()
 	if err != nil {
 		g.logger.WithField("error", err).Warn("Error getting commit sha")
 	}
 
-	g.BranchName, err = g.getBranchName()
+	result.BranchName, err = g.getBranchName()
 	if err != nil {
 		g.logger.WithField("error", err).Warn("Error getting branch name")
 	}
 
-	g.MainBranchForkPoint, err = g.getMainBranchForkPoint()
+	result.MainBranchForkPoint, err = g.getMainBranchForkPoint()
 	if err != nil {
 		g.logger.WithField("error", err).Warn("Error getting main branch fork point")
 	}
 
-	if len(g.CommitSha) > 0 && len(g.MainBranchForkPoint) > 0 {
-		g.ChangesSinceMainBranch, err = g.getChangesBetweenCommits(g.MainBranchForkPoint, g.CommitSha)
+	if len(result.CommitSha) > 0 && len(result.MainBranchForkPoint) > 0 {
+		result.ChangesSinceMainBranch, err = g.getChangesBetweenCommits(result.MainBranchForkPoint, result.CommitSha)
 		if err != nil {
 			g.logger.WithField("error", err).Warn("Error getting diff list")
 		} else {
-			g.logger.Debugf("Diff for branch: %s", g.ChangesSinceMainBranch)
+			g.logger.Debugf("Diff for branch: %s", result.ChangesSinceMainBranch)
 		}
 	}
 
 	g.logger.
-		WithField("commitSha", g.CommitSha).
-		WithField("branchName", g.BranchName).
-		WithField("mainBranchForkPoint", g.MainBranchForkPoint).
+		WithField("commitSha", result.CommitSha).
+		WithField("branchName", result.BranchName).
+		WithField("mainBranchForkPoint", result.MainBranchForkPoint).
 		Info("Loaded repo information")
 
-	return g
+	return result
 }

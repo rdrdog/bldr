@@ -5,6 +5,7 @@ import (
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/rdrdog/bldr/pkg/extensions"
+	"github.com/rdrdog/bldr/pkg/lib"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,7 +27,7 @@ func (p *K8sRun) SetConfig(logger *logrus.Logger, configuration *config.Configur
 	return mapstructure.Decode(pluginConfig, p)
 }
 
-func (p *K8sRun) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+func (p *K8sRun) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider, libProvider lib.LibProvider) error {
 
 	return nil
 }

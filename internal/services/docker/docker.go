@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rdrdog/bldr/internal/services/process"
 	"github.com/rdrdog/bldr/pkg/config"
-	"github.com/rdrdog/bldr/pkg/lib/process"
 	"github.com/sirupsen/logrus"
 )
 
