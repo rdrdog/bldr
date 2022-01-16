@@ -32,7 +32,7 @@ func NewPluginPipeline(logger *logrus.Logger, cfg *config.Configuration, pipelin
 
 	pipeline := &PluginPipeline{
 		config:             cfg,
-		contextProvider:    providers.NewContextProvider(logger),
+		contextProvider:    providers.NewContextProvider(logger, cfg),
 		extensionsProvider: providers.NewExtensionsProvider(logger, cfg, registry),
 		libProvider:        providers.NewDefaultLibProvider(logger, cfg),
 		logger:             logger,

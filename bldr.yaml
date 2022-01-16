@@ -1,13 +1,14 @@
 
 default:
-  logging:
-    level: DEBUG
-  paths:
-    pipelineconfigfile: samples/pipeline-config.yaml
   docker:
     useBuildKit: true
   git:
     mainBranchName: main
+  logging:
+    level: DEBUG
+  paths:
+    deploymentManifestFile: build-artefacts/manifest.yaml
+    pipelineConfigFile: samples/pipeline-config.yaml
 
 local:
   docker:

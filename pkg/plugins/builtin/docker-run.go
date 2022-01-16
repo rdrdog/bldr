@@ -11,7 +11,6 @@ import (
 )
 
 type DockerRun struct {
-	configuration    *config.Configuration
 	logger           *logrus.Logger
 	Name             string
 	SkipEnvironments []string
@@ -24,7 +23,6 @@ type DockerRunTargets struct {
 }
 
 func (p *DockerRun) SetConfig(logger *logrus.Logger, configuration *config.Configuration, pluginConfig map[string]interface{}) error {
-	p.configuration = configuration
 	p.logger = logger
 	return mapstructure.Decode(pluginConfig, p)
 }
@@ -37,7 +35,9 @@ func (p *DockerRun) Execute(contextProvider contexts.ContextProvider, extensions
 		return nil
 	}
 
-	p.logger.Debugf("%s is not listed in skip environments %v - running targets", dc.EnvironmentName, p.SkipEnvironments)
+	p.logger.Debugf("environment '%s' is not listed in skip environments %v - running targets", dc.EnvironmentName, p.SkipEnvironments)
+
+	docker := libProvider.GetDockerLib()
 
 	for _, t := range p.Targets {
 		secrets, err := extensionsProvider.GetSecretLoader().LoadSecrets(t.Name, t.Secrets)
@@ -47,7 +47,22 @@ func (p *DockerRun) Execute(contextProvider contexts.ContextProvider, extensions
 		}
 		p.logger.Debugf("loaded %d secrets for target %s", len(secrets), t.Name)
 
+		imageNameAndTag := dc.GetArtefactByName(t.Name)
+		err = docker.RunImage(imageNameAndTag, secretsToMap(secrets), nil)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
+}
+
+func secretsToMap(s []*extensions.SecretKeyValuePair) map[string]string {
+	result := make(map[string]string, len(s))
+	for _, val := range s {
+		result[val.Key] = val.Value
+	}
+
+	return result
 }
