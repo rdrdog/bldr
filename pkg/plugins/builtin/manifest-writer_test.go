@@ -25,6 +25,11 @@ func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
 	mw := &ManifestWriter{}
 	logger, _ := test.NewNullLogger()
 	mw.logger = logger
+	mw.config = &config.Configuration{}
+	mw.config.Paths = config.PathsConfig{
+		RepoRootDirectory:      ".",
+		BuildArtefactDirectory: ".",
+	}
 
 	config.Appfs = afero.NewMemMapFs()
 
@@ -38,16 +43,12 @@ func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
 			ShortCommitSha: "8f825b7",
 			BranchName:     "main",
 		},
-		PathContext: &contexts.PathContext{
-			RepoRootDirectory:      ".",
-			BuildArtefactDirectory: ".",
-		},
 	}
 	contextProvider := &mockContextProvider{
 		buildContext: buildContext,
 	}
 
-	mw.Execute(contextProvider, nil)
+	mw.Execute(contextProvider, nil, nil)
 
 	fileExists, _ := afero.Exists(config.Appfs, "./manifest.yaml")
 	// Check that the file exists

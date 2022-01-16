@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path"
 
 	"github.com/caarlos0/env"
 	"github.com/mitchellh/mapstructure"
@@ -10,19 +12,20 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const buildArtefactDirectoryName = "build-artefacts"
 const buildEnvironmentNameLocal = "local"
 const buildEnvironmentNameCI = "ci"
 const bldrConfigFileName = "bldr.yaml"
 const bldrConfigDefaults = `
 default:
-  logging:
-    level: INFO
-  pipeline:
-    path: pipeline-config.yaml
   docker:
     useBuildKit: true
   git:
     mainBranchName: main
+  logging:
+    level: INFO
+  paths:
+    pipelineconfigfile: pipeline-config.yaml
 
 local:
   docker:
@@ -39,8 +42,27 @@ ci:
     useRemoteContainerRegistryCache: true
 `
 
+func getConfigDefaults() *Configuration {
+	configDefaults := &Configuration{
+		Docker: DockerConfig{
+			UseBuildKit: true,
+		},
+		Git: GitConfig{
+			MainBranchName: "main",
+		},
+		Logging: LoggingConfig{
+			Level: "INFO",
+		},
+		Paths: PathsConfig{
+			PipelineConfigFile: "pipeline-config.yaml",
+		},
+	}
+
+	return configDefaults
+}
+
 func Load(logger *logrus.Logger) (*Configuration, error) {
-	newConfig := &Configuration{}
+	newConfig := getConfigDefaults()
 
 	// First, populate any environment var overrides
 	for _, configSection := range []interface{}{
@@ -48,7 +70,7 @@ func Load(logger *logrus.Logger) (*Configuration, error) {
 		&newConfig.Docker,
 		&newConfig.Git,
 		&newConfig.Logging,
-		&newConfig.Pipeline,
+		&newConfig.Paths,
 	} {
 		if err := env.Parse(configSection); err != nil {
 			return nil, fmt.Errorf("unable to load the config: %v", err)
@@ -72,6 +94,15 @@ func Load(logger *logrus.Logger) (*Configuration, error) {
 	}
 
 	newConfig.Logging.SetFormatter(logger)
+
+	newConfig.Paths.RepoRootDirectory, err = os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("unable to load current working directory: %v", err)
+	}
+
+	logger.Debugf("repo root directory determined to be %s", newConfig.Paths.RepoRootDirectory)
+	// Set the build artefact directory to be rooted at the repo root directory
+	newConfig.Paths.BuildArtefactDirectory = path.Join(newConfig.Paths.RepoRootDirectory, buildArtefactDirectoryName)
 
 	return newConfig, nil
 }

@@ -2,8 +2,8 @@
 default:
   logging:
     level: DEBUG
-  pipeline:
-    path: samples/pipeline-config.yaml
+  paths:
+    pipelineconfigfile: samples/pipeline-config.yaml
   docker:
     useBuildKit: true
   git:

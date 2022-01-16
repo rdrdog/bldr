@@ -4,7 +4,7 @@ import (
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/rdrdog/bldr/pkg/extensions"
-	"github.com/rdrdog/bldr/pkg/lib/git"
+	"github.com/rdrdog/bldr/pkg/lib"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,18 +19,17 @@ func (p *GitContextLoader) SetConfig(logger *logrus.Logger, configuration *confi
 	return nil
 }
 
-func (p *GitContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+func (p *GitContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider, libProvider lib.LibProvider) error {
 	bc := contextProvider.GetBuildContext()
-	p.logger.Infof("loading git context for path %s", bc.PathContext.RepoRootDirectory)
+	p.logger.Infof("loading git context for path %s", p.configuration.Paths.RepoRootDirectory)
 
-	git := git.New(p.logger, p.configuration.Git.MainBranchName, bc.PathContext.RepoRootDirectory)
-	git.LoadRepoInformation()
+	gitState := libProvider.GetGitLib().LoadRepoInformation()
 
-	bc.GitContext.BranchName = git.BranchName
-	bc.GitContext.FullCommitSha = git.CommitSha
-	bc.GitContext.ShortCommitSha = git.CommitSha[:7]
-	bc.GitContext.MainBranchForkPointShort = git.MainBranchForkPoint[:7]
-	bc.GitContext.ChangesSinceMainBranch = git.ChangesSinceMainBranch
+	bc.GitContext.BranchName = gitState.BranchName
+	bc.GitContext.FullCommitSha = gitState.CommitSha
+	bc.GitContext.ShortCommitSha = gitState.CommitSha[:7]
+	bc.GitContext.MainBranchForkPointShort = gitState.MainBranchForkPoint[:7]
+	bc.GitContext.ChangesSinceMainBranch = gitState.ChangesSinceMainBranch
 
 	return nil
 }

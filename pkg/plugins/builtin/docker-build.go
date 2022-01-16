@@ -9,7 +9,7 @@ import (
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/rdrdog/bldr/pkg/extensions"
-	"github.com/rdrdog/bldr/pkg/lib/docker"
+	"github.com/rdrdog/bldr/pkg/lib"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,7 +30,7 @@ func (p *DockerBuild) SetConfig(logger *logrus.Logger, configuration *config.Con
 	return mapstructure.Decode(pluginConfig, p)
 }
 
-func (p *DockerBuild) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider) error {
+func (p *DockerBuild) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider, libProvider lib.LibProvider) error {
 	bc := contextProvider.GetBuildContext()
 
 	imageTag := bc.GitContext.ShortCommitSha
@@ -40,7 +40,7 @@ func (p *DockerBuild) Execute(contextProvider contexts.ContextProvider, extensio
 	}
 
 	imageName := fmt.Sprintf("%s%s", p.configuration.Docker.Registry, p.Name)
-	docker := docker.New(p.configuration, p.logger)
+	docker := libProvider.GetDockerLib()
 
 	if !p.shouldBuildContainer(bc, docker, imageName, imageTag) {
 		p.logger.Infof("🦘 skipping build of target: %s", p.Name)
@@ -59,7 +59,7 @@ func (p *DockerBuild) Execute(contextProvider contexts.ContextProvider, extensio
 		fmt.Sprintf("%s=\"%s\"", buildArgContainerCommitSha, bc.GitContext.FullCommitSha),
 	}
 
-	docker.Build(p.Path, bc.PathContext.RepoRootDirectory, imageName, imageTag, buildArgs)
+	docker.Build(p.Path, p.configuration.Paths.RepoRootDirectory, imageName, imageTag, buildArgs)
 
 	if p.configuration.Docker.PushContainers {
 		docker.Push(imageName, imageTag)
@@ -89,7 +89,7 @@ func (p *DockerBuild) isAffectedByDiff(diffFilePaths []string) bool {
 	return false
 }
 
-func (p *DockerBuild) shouldBuildContainer(bc *contexts.BuildContext, docker *docker.Docker, imageName string, imageTag string) bool {
+func (p *DockerBuild) shouldBuildContainer(bc *contexts.BuildContext, docker lib.Docker, imageName string, imageTag string) bool {
 	if !bc.GitContext.CanDetectChanges() {
 		p.logger.Info("git context not in a state to detect changes - build is required")
 		return true
