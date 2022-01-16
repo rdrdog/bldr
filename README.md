@@ -1,5 +1,31 @@
 # bldr
 [![Build](https://github.com/rdrdog/bldr/actions/workflows/build.yaml/badge.svg)](https://github.com/rdrdog/bldr/actions/workflows/build.yaml)
+
+
+## Development
+
+Running tests:
+```
+go test ./... -v
+```
+
+Generating fakes (for new, or changed interfaces):
+```
+go generate ./...
+```
+
+Running bldr:
+
+```
+go run cmd/bldr/main.go
+```
+
+Running dplyr:
+
+```
+go run cmd/dplyr/main.go
+```
+
 ## Plugins
 
 - Some default initial plugins:
