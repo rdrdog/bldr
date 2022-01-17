@@ -47,7 +47,7 @@ func (p *PluginPipeline) LoadPipelineStages() error {
 
 	pipelineCfg, err := models.LoadPipelineConfig(p.config.Paths.PipelineConfigFile)
 	if err != nil {
-		// log/blow up
+		p.logger.Errorf("could not load pipeline configuration: %v", err)
 		return err
 	}
 

@@ -41,6 +41,8 @@ deploy:
           secrets:
             - key: GH_ADMIN_TOKEN
               envValue: GITHUB_TOKEN
+            - key: SPN_PASS
+              envValue: SPN_PASSWORD
 
   - name: k8s-deploy
     plugin: builtin/HelmDeploy

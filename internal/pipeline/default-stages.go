@@ -18,8 +18,14 @@ func (p *PluginPipeline) AddDefaultPostBuildStages() {
 	p.addPlugin(manifestWriter)
 }
 
-func (p *PluginPipeline) AddDefaultPreDeployStages() {
-
+func (p *PluginPipeline) AddDefaultPreDeployStages(environmentName string) {
+	deployContextLoader := &builtin.DeployContextLoader{}
+	cfg := map[string]interface{}{
+		"EnvironmentName": environmentName,
+	}
+	deployContextLoader.SetConfig(p.logger, p.config, cfg)
+	p.addPlugin(deployContextLoader)
+	p.logger.Infof("configured deployment context for environment '%s'", deployContextLoader.EnvironmentName)
 }
 
 func (p *PluginPipeline) AddDefaultPostDeployStages() {
