@@ -34,6 +34,15 @@ func TestGitContextLoaderExecute(t *testing.T) {
 	spec.Run(t, "GitContextLoader.Execute", testGitContextLoaderExecute, spec.Report(report.Terminal{}))
 }
 
+func TestGitContextLoader_SetConfig(t *testing.T) {
+	gc := &GitContextLoader{}
+
+	err := gc.SetConfig(nil, nil, nil)
+
+	assert.Nil(t, err)
+
+}
+
 func testGitContextLoaderExecute(t *testing.T, when spec.G, it spec.S) {
 	var p *GitContextLoader
 	var fakeContextProvider *contextsfakes.FakeContextProvider
