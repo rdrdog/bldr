@@ -21,7 +21,8 @@ type GitConfig struct {
 }
 
 type LoggingConfig struct {
-	Level string
+	Level  string
+	Masker *MaskingHook
 }
 
 type PathsConfig struct {
