@@ -95,7 +95,7 @@ func Load(logger *logrus.Logger) (*Configuration, error) {
 		mapstructure.Decode(bldrConfigData[buildEnvironmentNameLocal], newConfig)
 	}
 
-	newConfig.Logging.SetFormatter(logger)
+	newConfig.Logging.Configure(logger)
 
 	newConfig.Paths.RepoRootDirectory, err = os.Getwd()
 	if err != nil {

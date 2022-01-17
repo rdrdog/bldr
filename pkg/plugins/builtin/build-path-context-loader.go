@@ -35,7 +35,7 @@ func (p *BuildPathContextLoader) Execute(contextProvider contexts.ContextProvide
 	}
 
 	// Copy the pipeline-config.yaml to the artefact directory
-	_, pipelineConfigFileName := path.Split(p.configuration.Paths.PipelineConfigFile)
+	pipelineConfigFileName := path.Base(p.configuration.Paths.PipelineConfigFile)
 	pipelineConfigDst := path.Join(buildArtefactDir, pipelineConfigFileName)
 	utils.CopyFile(p.configuration.Paths.PipelineConfigFile, pipelineConfigDst)
 

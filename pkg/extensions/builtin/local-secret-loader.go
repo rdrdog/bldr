@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"path"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/pkg/config"
@@ -102,11 +103,13 @@ func (e *LocalSecretLoader) LoadSecrets(targetName string, secretParams []interf
 			return nil, err
 		}
 
-		// TODO - add `string(data)` to the logger's obfuscated values so it's not logged out
+		value := strings.TrimSpace(string(data))
+		// add the value to the logger's obfuscated values so it's not logged out
+		e.configuration.Logging.AddToSecretMask(value)
 
 		result[i] = &extensions.SecretKeyValuePair{
 			Key:   secret.EnvValue,
-			Value: string(data),
+			Value: value,
 		}
 	}
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/rdrdog/bldr/pkg/config"
 	"github.com/rdrdog/bldr/pkg/contexts"
+	"github.com/rdrdog/bldr/pkg/models"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -57,7 +58,7 @@ func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
 	// Check that the data in the file is the same as the one passed in by the test.
 	data, _ := afero.ReadFile(config.Appfs, "manifest.yaml")
 
-	var result manifest
+	var result models.Manifest
 	yaml.Unmarshal(data, &result)
 
 	assert.Equal(t, buildContext.BuildNumber, result.BuildNumber)
