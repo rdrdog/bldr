@@ -7,8 +7,9 @@ import (
 	"golang.org/x/term"
 )
 
-// SetFormatter sets the appropriate log formatter for our terminal (JSON if we're in Docker):
-func (l *LoggingConfig) SetFormatter(logger *logrus.Logger) {
+// Configure sets the appropriate log formatter for our terminal (JSON if we're in Docker), and sets up masking and log levels
+func (l *LoggingConfig) Configure(logger *logrus.Logger) {
+	l.Masker = &MaskingHook{MaskedValue: "***"}
 
 	// Detect if we're running in a terminal:
 	if term.IsTerminal(int(os.Stdout.Fd())) {
@@ -17,6 +18,8 @@ func (l *LoggingConfig) SetFormatter(logger *logrus.Logger) {
 		logger.SetFormatter(&logrus.JSONFormatter{})
 	}
 
+	logger.AddHook(l.Masker)
+
 	// Set the logging level specified in the config:
 	loggingLevel, err := logrus.ParseLevel(l.Level)
 	if err != nil {
@@ -24,4 +27,9 @@ func (l *LoggingConfig) SetFormatter(logger *logrus.Logger) {
 		return
 	}
 	logger.SetLevel(loggingLevel)
+}
+
+// Adds the specified secrets to the logging secret mask so that it's not emitted in the output
+func (l *LoggingConfig) AddToSecretMask(secret string) {
+	l.Masker.AddToMaskList(secret)
 }
