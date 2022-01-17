@@ -7,6 +7,7 @@ import (
 	"github.com/rdrdog/bldr/pkg/contexts"
 	"github.com/rdrdog/bldr/pkg/extensions"
 	"github.com/rdrdog/bldr/pkg/lib"
+	"github.com/rdrdog/bldr/pkg/models"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
@@ -28,10 +29,10 @@ func (p *ManifestWriter) SetConfig(logger *logrus.Logger, configuration *config.
 func (p *ManifestWriter) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider, libProvider lib.LibProvider) error {
 
 	bc := contextProvider.GetBuildContext()
-	manifestInstance := &manifest{
+	manifestInstance := &models.Manifest{
 		BuildNumber: bc.BuildNumber,
 		Artefacts:   bc.ArtefactManifest.Artefacts,
-		MetaData: metaData{
+		MetaData: models.ManifestMetaData{
 			BldrVersion:     config.BldrAppVersion,
 			ManifestVersion: config.ManifestVersion,
 		},
@@ -48,26 +49,11 @@ func (p *ManifestWriter) Execute(contextProvider contexts.ContextProvider, exten
 	}
 
 	manifestFilePath := path.Join(p.config.Paths.BuildArtefactDirectory, ManifestFileName)
-	err = afero.WriteFile(config.Appfs, manifestFilePath, manifestData, 0777)
+	err = afero.WriteFile(config.Appfs, manifestFilePath, manifestData, 0755)
 	if err != nil {
 		p.logger.Errorf("error writing manifest file to %s: %v", manifestFilePath, err)
 		return err
 	}
 
 	return nil
-}
-
-type manifest struct {
-	BuildNumber string
-	Repo        struct {
-		BranchName string
-		CommitSha  string
-	}
-	Artefacts map[string]string
-	MetaData  metaData
-}
-
-type metaData struct {
-	BldrVersion     string
-	ManifestVersion string
 }
