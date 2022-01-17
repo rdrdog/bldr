@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"path"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/rdrdog/bldr/pkg/config"
@@ -106,7 +107,7 @@ func (e *LocalSecretLoader) LoadSecrets(targetName string, secretParams []interf
 
 		result[i] = &extensions.SecretKeyValuePair{
 			Key:   secret.EnvValue,
-			Value: string(data),
+			Value: strings.TrimSpace(string(data)),
 		}
 	}
 
