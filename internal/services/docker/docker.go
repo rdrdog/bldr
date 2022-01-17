@@ -68,11 +68,12 @@ func (d *Docker) Build(dockerFilePath string, workingDirectory string, imageName
 
 func (d *Docker) PullLatest(imageName string) {
 	args := fmt.Sprintf("pull %s:latest", imageName)
-	_, _, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
+	_, stdErr, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
 
 	if err == nil {
 		d.logger.Infof("🐳 docker pull successful: %s", imageName)
 	} else {
+		d.logger.Error(stdErr)
 		d.logger.Fatalf("docker pull failed: %v", err)
 	}
 }
@@ -80,11 +81,12 @@ func (d *Docker) PullLatest(imageName string) {
 func (d *Docker) Push(imageName string, imageTag string) {
 	containerNameWithTag := fmt.Sprintf("%s:%s", imageName, imageTag)
 	args := fmt.Sprintf("push %s", containerNameWithTag)
-	_, _, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
+	_, stdErr, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
 
 	if err == nil {
 		d.logger.Infof("🐳 docker push successful: %s", containerNameWithTag)
 	} else {
+		d.logger.Error(stdErr)
 		d.logger.Fatalf("docker push failed: %v", err)
 	}
 }
@@ -148,9 +150,10 @@ func (d *Docker) RunImage(imageNameAndTag string, envVars map[string]string, add
 	additionalArgsString := mapToKeyEqualsValue(additionalArgs, "")
 
 	args := fmt.Sprintf("run --rm %s %s %s", envVarString, additionalArgsString, imageNameAndTag)
-	_, _, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
+	_, stdErr, err := process.New("docker", ".", d.logger).WithArgs(args).Run()
 
 	if err != nil {
+		d.logger.Error(stdErr)
 		d.logger.Errorf("docker run failed: %v", err)
 		return err
 	}

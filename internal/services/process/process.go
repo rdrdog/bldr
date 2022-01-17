@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-cmd/cmd"
+	"github.com/gookit/goutil/strutil"
 	"github.com/sirupsen/logrus"
 )
 
@@ -62,7 +63,8 @@ func (p *Process) logCommandOutput(command *cmd.Cmd) {
 }
 
 func (p *Process) run() (string, string, error) {
-	command := cmd.NewCmd(p.cmd, strings.Split(p.args, " ")...)
+	argsArray := strutil.SplitValid(p.args, " ") // removes any empty args
+	command := cmd.NewCmd(p.cmd, argsArray...)
 	command.Dir = p.workingDir
 	command.Env = append(os.Environ(), p.env...)
 	p.log.Debugf("running command %s %s", p.cmd, p.args)
