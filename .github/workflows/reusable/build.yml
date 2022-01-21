@@ -1,0 +1,46 @@
+name: bldr build
+on:
+  workflow_call:
+    inputs:
+      bldrVersion:
+        required: false
+        type: string
+        default: "v1.0"
+jobs:
+  BuildAndPushImages:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Fetch bldr binary
+        uses: giantswarm/install-binary-action@v1
+        with:
+          version: ${{ inputs.bldrVersion }}
+          download_url: "https://github.com/rdrdog/bldr/releases/download/${version}/bldr_Linux_x86_64.tar.gz"
+          tarball_binary_path: "bldr"
+
+      # Sets GIT_BRANCH_NAME env var
+      - name: Get the branch name
+        shell: bash
+        run: |
+          # Get branch name
+          branchName=$GITHUB_HEAD_REF
+          if [[ "$branchName" == "" ]]; then
+            branchName=${GITHUB_REF#refs/heads/}
+          fi
+          echo "GIT_BRANCH_NAME=$branchName" >> $GITHUB_ENV
+
+      - name: Build Images
+        env:
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }} # only defined for prs, main branch will use default logic to fetch commit sha.
+        run: |
+          export CI=true
+          ./bldr build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artefacts
+          path: build-artefacts/*

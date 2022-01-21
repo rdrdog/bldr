@@ -1,0 +1,31 @@
+name: bldr deploy
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      bldrVersion:
+        required: false
+        type: string
+        default: "v1.0"
+jobs:
+  Deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download container manifest
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artefacts
+
+      - name: Fetch bldr binary
+        uses: giantswarm/install-binary-action@v1
+        with:
+          version: ${{ inputs.bldrVersion }}
+          download_url: "https://github.com/rdrdog/bldr/releases/download/${version}/bldr_Linux_x86_64.tar.gz"
+          tarball_binary_path: "bldr"
+
+      - name: Execute deployment
+        run: |
+          ./bldr deploy ${{ inputs.environment }}

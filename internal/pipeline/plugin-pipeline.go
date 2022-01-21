@@ -18,7 +18,6 @@ type PluginPipeline struct {
 	extensionsProvider *providers.DefaultExtensionsProvider
 	libProvider        *providers.DefaultLibProvider
 	logger             *logrus.Logger
-	mode               string
 	plugins            []plugins.PluginDefinition
 	registry           *providers.Registry
 }
@@ -27,7 +26,7 @@ func (p *PluginPipeline) addPlugin(plugin plugins.PluginDefinition) {
 	p.plugins = append(p.plugins, plugin)
 }
 
-func NewPluginPipeline(logger *logrus.Logger, cfg *config.Configuration, pipelineOperationMode string) *PluginPipeline {
+func NewPluginPipeline(logger *logrus.Logger, cfg *config.Configuration) *PluginPipeline {
 	registry := providers.NewRegistry(logger)
 
 	pipeline := &PluginPipeline{
@@ -36,24 +35,22 @@ func NewPluginPipeline(logger *logrus.Logger, cfg *config.Configuration, pipelin
 		extensionsProvider: providers.NewExtensionsProvider(logger, cfg, registry),
 		libProvider:        providers.NewDefaultLibProvider(logger, cfg),
 		logger:             logger,
-		mode:               pipelineOperationMode,
 		registry:           registry,
 	}
 
 	return pipeline
 }
 
-func (p *PluginPipeline) LoadPipelineStages() error {
+func (p *PluginPipeline) LoadPipelineStages(pipelineMode string) {
 
 	pipelineCfg, err := models.LoadPipelineConfig(p.config.Paths.PipelineConfigFile)
 	if err != nil {
-		p.logger.Errorf("could not load pipeline configuration: %v", err)
-		return err
+		p.logger.Fatalf("could not load pipeline configuration: %v", err)
 	}
 
 	var stages []models.Stage
 
-	switch p.mode {
+	switch pipelineMode {
 	case config.PipelineOperationModeBuild:
 		p.extensionsProvider.LoadExtensions(pipelineCfg.Build.Extensions)
 		stages = pipelineCfg.Build.Stages
@@ -61,7 +58,7 @@ func (p *PluginPipeline) LoadPipelineStages() error {
 		p.extensionsProvider.LoadExtensions(pipelineCfg.Deploy.Extensions)
 		stages = pipelineCfg.Deploy.Stages
 	default:
-		return fmt.Errorf("unexpected operation mode: '%s'", p.mode)
+		p.logger.Fatalf("unexpected operation mode: '%s'", pipelineMode)
 	}
 
 	for i, s := range stages {
@@ -72,22 +69,20 @@ func (p *PluginPipeline) LoadPipelineStages() error {
 
 		pluginInterface, err := p.registry.CreateInstance(s.Plugin)
 		if err != nil {
-			return err
+			p.logger.Fatalf("could not create plugin registry instance: %v", err)
 		}
 
 		pluginInstance := pluginInterface.(plugins.PluginDefinition)
 
-		yamlPath := fmt.Sprintf("$.%s.stages[%d].params", p.mode, i)
+		yamlPath := fmt.Sprintf("$.%s.stages[%d].params", pipelineMode, i)
 		pluginConfig := pipelineCfg.LoadPluginConfig(yamlPath)
 
 		err = pluginInstance.SetConfig(p.logger, p.config, pluginConfig)
 		if err != nil {
-			return err
+			p.logger.Fatalf("could not initialise configuration for plugin %s on stage %s: %v", s.Plugin, s.Name, err)
 		}
 		p.addPlugin(pluginInstance)
 	}
-
-	return nil
 }
 
 func (p *PluginPipeline) Run() error {
