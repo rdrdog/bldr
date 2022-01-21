@@ -1,0 +1,36 @@
+name: Build and deploy
+concurrency:
+  group: ${{ github.ref_name }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    uses: rdrdog/bldr/.github/workflows/reusable/build.yml@v1
+
+  deploy-dev:
+    uses: rdrdog/bldr/.github/workflows/reusable/deploy.yml@v1
+    needs: build
+    with:
+      environment: dev
+
+  deploy-test:
+    if: ${{ endsWith(github.ref, '/main') }}
+    uses: rdrdog/bldr/.github/workflows/reusable/deploy.yml@v1
+    needs: deploy-dev
+    with:
+      environment: test
+
+  deploy-prod:
+    if: ${{ endsWith(github.ref, '/main') }}
+    uses: rdrdog/bldr/.github/workflows/reusable/deploy.yml@v1
+    needs: deploy-test
+    with:
+      environment: prod
