@@ -21,7 +21,6 @@ func (p *GitContextLoader) SetConfig(logger *logrus.Logger, configuration *confi
 
 func (p *GitContextLoader) Execute(contextProvider contexts.ContextProvider, extensionsProvider extensions.ExtensionsProvider, libProvider lib.LibProvider) error {
 	bc := contextProvider.GetBuildContext()
-	p.logger.Infof("loading git context for path %s", p.configuration.Paths.RepoRootDirectory)
 
 	gitState := libProvider.GetGitLib().LoadRepoInformation()
 

@@ -91,6 +91,8 @@ func (g *Git) getBranchName() (string, error) {
 }
 
 func (g *Git) LoadRepoInformation() *lib.GitState {
+	g.logger.Infof("loading git context for path %s", g.repoRootDirectory)
+
 	result := &lib.GitState{}
 	var err error
 	result.CommitSha, err = g.getRepoCommitSha()

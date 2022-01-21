@@ -18,6 +18,7 @@ func TestManifestWriter_SetConfig(t *testing.T) {
 	err := mw.SetConfig(nil, nil, nil)
 
 	assert.Nil(t, err)
+
 }
 
 func TestManifestWriter_Execute_File_Exists_And_Has_Data(t *testing.T) {
