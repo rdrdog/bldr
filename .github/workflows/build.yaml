@@ -1,5 +1,7 @@
-
-name: Go
+name: Run build checks
+concurrency:
+  group: ${{ github.ref_name }}
+  cancel-in-progress: true
 
 on:
   push:
@@ -7,16 +9,127 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  GO_VERSION: 1.17
+  CGO_ENABLED: 0
+
 jobs:
 
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17
-    - name: Test
-      run: go test -v ./... -covermode=atomic
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Test
+        run: make test
+
+  snapshot:
+    name: snapshot
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - uses: actions/cache@v2
+        if: ${{ !env.ACT }}
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --snapshot --rm-dist
+
+      - name: Capture x86_64 (64-bit) Linux binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-linux-amd64
+          path: dist/bldr_linux_amd64/*
+
+      - name: Capture i386 (32-bit) Linux binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-linux-i386
+          path: dist/bldr_linux_386/*
+
+      - name: Capture arm64 (64-bit) Linux binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-linux-arm64
+          path: dist/bldr_linux_arm64/*
+
+      - name: Capture armv6 (32-bit) Linux binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-linux-armv6
+          path: dist/bldr_linux_arm_6/*
+
+      - name: Capture armv7 (32-bit) Linux binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-linux-armv7
+          path: dist/bldr_linux_arm_7/*
+
+      - name: Capture x86_64 (64-bit) Windows binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-windows-amd64
+          path: dist/bldr_windows_amd64/*.*
+
+      - name: Capture i386 (32-bit) Windows binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-windows-i386
+          path: dist/bldr_windows_386/*.*
+
+      - name: Capture arm64 (64-bit) Windows binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-windows-arm64
+          path: dist/bldr_windows_arm64/*.*
+
+      - name: Capture armv7 (32-bit) Windows binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-windows-armv7
+          path: dist/bldr_windows_arm_7/*.*
+
+      - name: Capture x86_64 (64-bit) MacOS binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-macos-amd64
+          path: dist/bldr_darwin_amd64/*
+
+      - name: Capture arm64 (64-bit) MacOS binary
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bldr-macos-arm64
+          path: dist/bldr_darwin_arm64/*
