@@ -6,7 +6,7 @@ require (
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/go-cmd/cmd v1.4.0
 	github.com/goccy/go-yaml v1.9.4
-	github.com/gookit/goutil v0.4.2
+	github.com/gookit/goutil v0.4.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.4.1
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/onsi/gomega v1.17.0
