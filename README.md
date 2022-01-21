@@ -2,9 +2,7 @@
 [![Build](https://github.com/rdrdog/bldr/actions/workflows/build.yaml/badge.svg)](https://github.com/rdrdog/bldr/actions/workflows/build.yaml)
 
 
-**Bldr** is a framework to make building containers in a mono-repo easy!
-
-**Dplyr** is a companion framework to make deploying these containers to Kubernetes (or other cloud services) easy too!
+**Bldr** is a framework to make building containers in a mono-repo easy! It also includes functionality to make deploying these containers to Kubernetes (or other cloud services) easy too!
 
 ## Standard use cases
 You should consider using this framework if:
@@ -85,16 +83,16 @@ Generating fakes (for new, or changed interfaces):
 make generate
 ```
 
-Running bldr:
+Running build:
 
 ```
-go run cmd/bldr/main.go
+go run main.go build
 ```
 
-Running dplyr:
+Running deploy:
 
 ```
-go run cmd/dplyr/main.go
+go run main.go deploy
 ```
 
 ## Plugins

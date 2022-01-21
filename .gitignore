@@ -20,4 +20,5 @@ secrets
 *.out
 
 build-artefacts
+dist
 samples/examples
