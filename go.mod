@@ -9,7 +9,7 @@ require (
 	github.com/gookit/goutil v0.4.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.4.1
 	github.com/mitchellh/mapstructure v1.4.3
-	github.com/onsi/gomega v1.17.0
+	github.com/onsi/gomega v1.18.0
 	github.com/sclevine/spec v1.4.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/afero v1.8.0
