@@ -59,77 +59,77 @@ jobs:
 
       - name: Capture x86_64 (64-bit) Linux binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-linux-amd64
           path: dist/bldr_linux_amd64/*
 
       - name: Capture i386 (32-bit) Linux binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-linux-i386
           path: dist/bldr_linux_386/*
 
       - name: Capture arm64 (64-bit) Linux binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-linux-arm64
           path: dist/bldr_linux_arm64/*
 
       - name: Capture armv6 (32-bit) Linux binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-linux-armv6
           path: dist/bldr_linux_arm_6/*
 
       - name: Capture armv7 (32-bit) Linux binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-linux-armv7
           path: dist/bldr_linux_arm_7/*
 
       - name: Capture x86_64 (64-bit) Windows binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-windows-amd64
           path: dist/bldr_windows_amd64/*.*
 
       - name: Capture i386 (32-bit) Windows binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-windows-i386
           path: dist/bldr_windows_386/*.*
 
       - name: Capture arm64 (64-bit) Windows binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-windows-arm64
           path: dist/bldr_windows_arm64/*.*
 
       - name: Capture armv7 (32-bit) Windows binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-windows-armv7
           path: dist/bldr_windows_arm_7/*.*
 
       - name: Capture x86_64 (64-bit) MacOS binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-macos-amd64
           path: dist/bldr_darwin_amd64/*
 
       - name: Capture arm64 (64-bit) MacOS binary
         if: ${{ !env.ACT }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bldr-macos-arm64
           path: dist/bldr_darwin_arm64/*
